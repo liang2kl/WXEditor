@@ -1,0 +1,38 @@
+//
+//  BlurView.swift
+//  Whiz
+//
+//  Created by 梁业升 on 2020/7/21.
+//  Copyright © 2020 梁业升. All rights reserved.
+//
+
+import SwiftUI
+
+struct BlurView: UIViewRepresentable {
+    let style: UIBlurEffect.Style
+    
+    func makeUIView(context: UIViewRepresentableContext<BlurView>) -> UIView {
+        let view = UIView(frame: .zero)
+        view.backgroundColor = .clear
+        let blurEffect = UIBlurEffect(style: style)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(blurView)
+        NSLayoutConstraint.activate([
+            blurView.heightAnchor
+            .constraint(equalTo: view.heightAnchor),
+            blurView.widthAnchor
+            .constraint(equalTo: view.widthAnchor)
+        ])
+        return view
+    }
+    
+    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<BlurView>) {
+    }
+}
+
+struct BlurView_Previews: PreviewProvider {
+    static var previews: some View {
+        BlurView(style: .regular)
+    }
+}
