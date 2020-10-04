@@ -55,6 +55,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
 
 protocol Component {
     var id: UUID { get set }
+    var className: String { get set }
     var childs: [Component] { get set }
     var parent: Component? { get set }
     var string: String? { get set }
@@ -81,8 +82,9 @@ extension Component {
                 backString.append(string)
             }
         }
+        let className = self.className == "" ? "" : "class=\"\(self.className)\""
         return
-            "<\(htmlComponent.head)>" +
+            "<\(htmlComponent.head + className)>" +
             frontString +
             "\(string ?? "")" +
             backString +
@@ -101,6 +103,7 @@ extension Component {
 
 class RootComponent: Component {
     var id: UUID = UUID()
+    var className: String = ""
     var childs: [Component]
     var parent: Component? = nil
     var string: String?
@@ -113,109 +116,126 @@ class RootComponent: Component {
 
 class P: Component {
     var id: UUID
+    var className: String
     var childs: [Component]
     var parent: Component?
     var string: String?
     var htmlComponent: HTMLComponent = .p
-    init(id: UUID = UUID(), childs: [Component] = [], string: String? = nil, parent: Component) {
+    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
         self.id = id
         self.childs = childs
         self.string = string
         self.parent = parent
+        self.className = className
     }
 }
 
 class Section: Component {
     var id: UUID
+    var className: String
     var childs: [Component]
     var parent: Component?
     var string: String?
     var htmlComponent: HTMLComponent = .section
-    init(id: UUID = UUID(), childs: [Component] = [], string: String? = nil, parent: Component) {
+    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
         self.id = id
         self.childs = childs
         self.string = string
         self.parent = parent
+        self.className = className
     }
 }
 
 class Span: Component {
     var id: UUID
+    var className: String
     var childs: [Component]
     var parent: Component?
     var string: String?
     var htmlComponent: HTMLComponent = .span
-    init(id: UUID = UUID(), childs: [Component] = [], string: String? = nil, parent: Component) {
+    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
         self.id = id
         self.childs = childs
         self.string = string
         self.parent = parent
+        self.className = className
     }
 }
 
 class H1: Component {
     var id: UUID
+    var className: String
     var childs: [Component]
     var parent: Component?
     var string: String?
     var htmlComponent: HTMLComponent = .h1
-    init(id: UUID = UUID(), childs: [Component] = [], string: String? = nil, parent: Component) {
+    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
         self.id = id
         self.childs = childs
         self.string = string
         self.parent = parent
+        self.className = className
     }
 }
 
 class H2: Component {
     var id: UUID
+    var className: String
     var childs: [Component]
     var parent: Component?
     var string: String?
     var htmlComponent: HTMLComponent = .h2
-    init(id: UUID = UUID(), childs: [Component] = [], string: String? = nil, parent: Component) {
+    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
         self.id = id
         self.childs = childs
         self.string = string
         self.parent = parent
+        self.className = className
     }
 }
 
 class BlockQuote: Component {
     var id: UUID
+    var className: String
     var childs: [Component]
     var parent: Component?
     var string: String?
     var htmlComponent: HTMLComponent = .blockquote
-    init(id: UUID = UUID(), childs: [Component] = [], string: String? = nil, parent: Component) {
+    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
         self.id = id
         self.childs = childs
         self.string = string
         self.parent = parent
+        self.className = className
     }
 }
 
 class IMG: Component {
     var id: UUID = UUID()
+    var className: String
     var childs: [Component] = []
     var parent: Component?
     var string: String?
     var htmlComponent: HTMLComponent = .img
     func makeComponent() -> String {
-        return "<img class=\"image\" src=\"\(string ?? "")\">"
+        let className = self.className == "" ? "" : "class=\"\(self.className)\""
+        print("<img \(className) src=\"\(string ?? "")\">")
+        return "<img \(className) src=\"\(string ?? "")\">"
     }
     
-    init(url: String = "", id: UUID = UUID(), childs: [Component] = [], parent: Component) {
+    init(url: String = "", id: UUID = UUID(), className: String = "", childs: [Component] = [], parent: Component) {
         self.string = url
         self.id = id
         self.childs = childs
         self.parent = parent
+        self.className = className
     }
 }
 
 class BR: Component {
     var id: UUID
     var childs: [Component] = []
+    var className: String = ""
     var parent: Component?
     var string: String? = nil
     var htmlComponent: HTMLComponent = .br
@@ -228,13 +248,15 @@ class BR: Component {
 
 class HR: Component {
     var id: UUID
+    var className: String
     var childs: [Component] = []
     var parent: Component?
     var string: String? = nil
     var htmlComponent: HTMLComponent = .hr
-    init(id: UUID = UUID(), childs: [Component] = [], parent: Component) {
+    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], parent: Component) {
         self.id = id
         self.parent = parent
         self.childs = childs
+        self.className = className
     }
 }

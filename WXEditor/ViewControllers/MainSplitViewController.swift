@@ -8,6 +8,7 @@
 import SwiftUI
 
 class MainSplitViewController: UISplitViewController {
+    let blankViewController = UIHostingController<BlankView>(rootView: BlankView())
     override func viewDidLoad() {
         super.viewDidLoad()
         preferredDisplayMode = .twoBesideSecondary
@@ -15,7 +16,7 @@ class MainSplitViewController: UISplitViewController {
         let generator = HTMLGenerator()
         setViewController(EditorViewController(generator: generator), for: .primary)
         setViewController(HTMLPreviewViewController(generator: generator), for: .secondary)
-        setViewController(UIViewController(), for: .supplementary)
+        setViewController(blankViewController, for: .supplementary)
     }
     
     init() {

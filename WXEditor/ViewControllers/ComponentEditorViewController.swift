@@ -25,25 +25,28 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateComponent(component: Component, type: HTMLComponent, string: String?) {
-        print(component)
+    func updateComponent(component: Component, type: HTMLComponent, className: String, string: String?) {
         let childs = component.childs
         let id = component.id
         var parent = component.parent!
-        switch componentState.type {
-        case .blockquote: self.component = BlockQuote(id: id, childs: childs, string: string, parent: parent)
+        print("iddd", component.id)
+        print("iddd", parent.id)
+        switch type {
+        case .blockquote: self.component = BlockQuote(id: id, className: className, childs: childs, string: string, parent: parent)
         case .br: self.component = BR(id: id, childs: childs, parent: parent)
-        case .h1: self.component = H1(id: id, childs: childs, string: string, parent: parent)
-        case .h2: self.component = H2(id: id, childs: childs, string: string, parent: parent)
-        case .hr: self.component = HR(id: id, childs: childs, parent: parent)
-        case .img: self.component = IMG(url: string ?? "", id: id, childs: childs, parent: parent)
-        case .p: self.component = P(id: id, childs: childs, string: string, parent: parent)
-        case .section: self.component = Section(id: id, childs: childs, string: string, parent: parent)
-        case .span: self.component = Span(id: id, childs: childs, string: string, parent: parent)
+        case .h1: self.component = H1(id: id, className: className, childs: childs, string: string, parent: parent)
+        case .h2: self.component = H2(id: id, className: className, childs: childs, string: string, parent: parent)
+        case .hr: self.component = HR(id: id, className: className, childs: childs, parent: parent)
+        case .img: self.component = IMG(url: string ?? "", id: id, className: className, childs: childs, parent: parent)
+        case .p: self.component = P(id: id, className: className, childs: childs, string: string, parent: parent)
+        case .section: self.component = Section(id: id, className: className, childs: childs, string: string, parent: parent)
+        case .span: self.component = Span(id: id, className: className, childs: childs, string: string, parent: parent)
         }
+        print(component)
         let originalComponentIndex = parent.childs.firstIndex(where: {$0.id == id})!
         parent.childs.remove(at: originalComponentIndex)
         parent.childs.insert(self.component, at: originalComponentIndex)
+        print(self.component)
         updateSideBar()
     }
     
@@ -106,6 +109,9 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
 }
 
 class ComponentState: ObservableObject {
+    @Published var className: String {
+        didSet { update() }
+    }
     @Published var string: String {
         didSet { update() }
     }
@@ -116,11 +122,12 @@ class ComponentState: ObservableObject {
     
     private func update() {
         if let vc = viewController {
-            vc.updateComponent(component: vc.component, type: type, string: string)
+            vc.updateComponent(component: vc.component, type: type, className: className, string: string)
         }
     }
     init(component: Component) {
         self.string = component.string ?? ""
         self.type = component.htmlComponent
+        self.className = component.className
     }
 }

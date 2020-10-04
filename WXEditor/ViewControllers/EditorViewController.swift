@@ -150,11 +150,6 @@ extension EditorViewController {
     
     private func getChilds(item: Item, component: Component, snapShot: NSDiffableDataSourceSectionSnapshot<Item>) ->  NSDiffableDataSourceSectionSnapshot<Item> {
         var snapShot = snapShot
-//        if component.htmlComponent == .img ||
-//            component.htmlComponent == .hr ||
-//            component.htmlComponent == .br {
-//            return snapShot
-//        }
         for child in component.childs {
             let childItem = Item(component: child)
             snapShot.append([childItem], to: item)

@@ -29,6 +29,7 @@
 		0EAF0D082528C18700F552E6 /* TopBarViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CFF2528C18700F552E6 /* TopBarViewModifier.swift */; };
 		0EAF0D092528C18700F552E6 /* Stroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0D002528C18700F552E6 /* Stroke.swift */; };
 		0EAF0D0A2528C18700F552E6 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0D012528C18700F552E6 /* CardModifier.swift */; };
+		0EC771A82529C0E200F24032 /* BlankView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC771A72529C0E200F24032 /* BlankView.swift */; };
 		0ED9D580252859BB00C5FB76 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED9D57F252859BB00C5FB76 /* AppDelegate.swift */; };
 		0ED9D582252859BB00C5FB76 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED9D581252859BB00C5FB76 /* SceneDelegate.swift */; };
 		0ED9D584252859BB00C5FB76 /* HTMLPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED9D583252859BB00C5FB76 /* HTMLPreviewViewController.swift */; };
@@ -65,6 +66,7 @@
 		0EAF0CFF2528C18700F552E6 /* TopBarViewModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopBarViewModifier.swift; sourceTree = "<group>"; };
 		0EAF0D002528C18700F552E6 /* Stroke.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stroke.swift; sourceTree = "<group>"; };
 		0EAF0D012528C18700F552E6 /* CardModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardModifier.swift; sourceTree = "<group>"; };
+		0EC771A72529C0E200F24032 /* BlankView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlankView.swift; sourceTree = "<group>"; };
 		0ED9D57C252859BB00C5FB76 /* WXEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WXEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0ED9D57F252859BB00C5FB76 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0ED9D581252859BB00C5FB76 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 				0EAF0CF82528C18700F552E6 /* Modifiers */,
 				0EAF0CE02528C16600F552E6 /* Components */,
 				0ED9D5A4252875C500C5FB76 /* ComponentEditorView.swift */,
+				0EC771A72529C0E200F24032 /* BlankView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -281,6 +284,7 @@
 				0EAF0CD92528922900F552E6 /* EditorViewController.swift in Sources */,
 				0ED9D5A5252875C500C5FB76 /* ComponentEditorView.swift in Sources */,
 				0EAF0CF32528C16600F552E6 /* CircularButton.swift in Sources */,
+				0EC771A82529C0E200F24032 /* BlankView.swift in Sources */,
 				0ED9D580252859BB00C5FB76 /* AppDelegate.swift in Sources */,
 				0EAF0CDD252895DA00F552E6 /* UIColor+tint.swift in Sources */,
 				0EAF0CEB2528C16600F552E6 /* BlurView.swift in Sources */,
