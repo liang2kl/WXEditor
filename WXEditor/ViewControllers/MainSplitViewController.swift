@@ -12,8 +12,9 @@ class MainSplitViewController: UISplitViewController {
         super.viewDidLoad()
         preferredDisplayMode = .twoBesideSecondary
         preferredSplitBehavior = .tile
-        setViewController(EditorViewController(generator: HTMLGenerator()), for: .primary)
-        setViewController(HTMLPreviewViewController(), for: .secondary)
+        let generator = HTMLGenerator()
+        setViewController(EditorViewController(generator: generator), for: .primary)
+        setViewController(HTMLPreviewViewController(generator: generator), for: .secondary)
         setViewController(UIViewController(), for: .supplementary)
     }
     

@@ -11,7 +11,7 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
     
     private var contentOffset: CGPoint?
     private var webView: WKWebView!
-    var generator = HTMLGenerator()
+    var generator: HTMLGenerator
     
     override func loadView() {
         let webConfiguration = WKWebViewConfiguration()
@@ -22,7 +22,7 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        webView.loadHTMLString(generator.generateHTML(), baseURL: nil)
+        loadHTML()
         navigationItem.title = NSLocalizedString("Preview", comment: "")
     }
     
@@ -30,10 +30,15 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
         let contentOffset = webView.scrollView.contentOffset
         let zoomScale = webView.scrollView.zoomScale
         let contentInset = webView.scrollView.contentInset
-        webView.loadHTMLString(generator.generateHTML(), baseURL: nil)
+        loadHTML()
         webView.scrollView.setZoomScale(zoomScale, animated: true)
         webView.scrollView.contentInset = contentInset
         webView.scrollView.setContentOffset(contentOffset, animated: true)
+    }
+    
+    func loadHTML() {
+        let url = URL(fileURLWithPath: "file:///WXEditor/Support")
+        webView.loadHTMLString(generator.generateHTML(), baseURL: url)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -45,5 +50,13 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
         }
     }
     
+    init(generator: HTMLGenerator) {
+        self.generator = generator
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
