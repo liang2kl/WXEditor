@@ -25,7 +25,7 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateComponent(component: Component, type: HTMLComponent, className: String, string: String?) {
+    func updateComponent(component: Component, type: HTMLComponent, className: String, string: String?, refreshSideBar: Bool) {
         let childs = component.childs
         let id = component.id
         let parent = component.parent!
@@ -36,7 +36,9 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         for index in 0..<childs.count {
             self.component.childs[index].parent = self.component
         }
-        updateSideBar()
+        if refreshSideBar {
+            updateSideBar()
+        }
     }
     
     func updateSideBar() {
@@ -47,7 +49,8 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     
     
     func updatePreview() {
-        guard let previewVc = splitViewController?.viewController(for: .secondary) as? HTMLPreviewViewController else { return }
+        guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
+              let previewVc = navVc.topViewController as? HTMLPreviewViewController else { return }
         previewVc.reload()
     }
     
@@ -77,7 +80,8 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     }
     
     func update(id: UUID) {
-        guard let previewVc = splitViewController?.viewController(for: .secondary) as? HTMLPreviewViewController,
+        guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
+              let previewVc = navVc.topViewController as? HTMLPreviewViewController,
               let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController else { return }
         previewVc.reload()
         editorVc.applySnapshots()
@@ -89,19 +93,19 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
 
 class ComponentState: ObservableObject {
     @Published var className: String {
-        didSet { update() }
+        didSet { update(refreshSideBar: false) }
     }
     @Published var string: String {
-        didSet { update() }
+        didSet { update(refreshSideBar: true) }
     }
     @Published var type: HTMLComponent {
-        didSet { update() }
+        didSet { update(refreshSideBar: true) }
     }
     var viewController: ComponentEditorViewController?
     
-    private func update() {
+    private func update(refreshSideBar: Bool) {
         if let vc = viewController {
-            vc.updateComponent(component: vc.component, type: type, className: className, string: string)
+            vc.updateComponent(component: vc.component, type: type, className: className, string: string, refreshSideBar: refreshSideBar)
         }
     }
     init(component: Component) {

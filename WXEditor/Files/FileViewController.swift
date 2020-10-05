@@ -53,7 +53,7 @@ class FileViewController: UICollectionViewController {
             self.url = url
             if url.hasDirectoryPath {
                 type = .folder
-            } else if url.pathExtension == "wed" {
+            } else if url.pathExtension == "wedoc" {
                 type = .doc
             } else {
                 type = .other
@@ -173,7 +173,7 @@ class FileViewController: UICollectionViewController {
             case .folder:
                 urls = []
             case .doc:
-                urls = try fileManager.urls(forType: "wed")
+                urls = try fileManager.urls(forType: "wedoc")
             case .other:
                 urls = []
             }
@@ -319,7 +319,7 @@ class FileViewController: UICollectionViewController {
     
     func addFile() {
         let data = FileGenerator.generate(fromRoot: Component(type: .root, parent: nil)) ?? Data()
-        try! _ = fileManager.createFile(from: data, fileName: "New File", pathExtension: "wed")
+        try! _ = fileManager.createFile(from: data, fileName: "New File", pathExtension: "wedoc")
         applySnapShots()
     }
     

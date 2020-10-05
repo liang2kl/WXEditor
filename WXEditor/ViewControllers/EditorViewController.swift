@@ -86,7 +86,10 @@ extension EditorViewController {
     }
     
     func configurePreview() {
-        (splitViewController?.viewController(for: .secondary) as? HTMLPreviewViewController)?.generator = generator
+        let newVc = HTMLPreviewViewController(generator: generator)
+        let navVc = UINavigationController(rootViewController: newVc)
+
+        splitViewController?.setViewController(navVc, for: .secondary)
     }
 
     func createLayout() -> UICollectionViewLayout {
@@ -133,12 +136,12 @@ extension EditorViewController {
             (collectionView, indexPath, item) -> UICollectionViewCell? in
             return collectionView.dequeueConfiguredReusableCell(using: self.configuredOutlineCell(), for: indexPath, item: item)
         }
-        // Allow every item to be reordered
-        dataSource.reorderingHandlers.canReorderItem = { item in return true }
-
-        // Option 1: Update the backing store from a CollectionDifference
-        dataSource.reorderingHandlers.didReorder = { transaction in
-        }
+//        // Allow every item to be reordered
+//        dataSource.reorderingHandlers.canReorderItem = { item in return true }
+//
+//        // Option 1: Update the backing store from a CollectionDifference
+//        dataSource.reorderingHandlers.didReorder = { transaction in
+//        }
     }
     
     func applySnapshots(initial: Bool = false) {
@@ -257,8 +260,9 @@ extension EditorViewController {
     }
     
     func updateHTML() {
-        guard let vc = splitViewController?.viewController(for: .secondary) as? HTMLPreviewViewController else { return }
-        vc.reload()
+        guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
+              let previewVc = navVc.topViewController as? HTMLPreviewViewController else { return }
+        previewVc.reload()
     }
     
     func saveDocument() {
@@ -266,7 +270,6 @@ extension EditorViewController {
             guard let data = FileGenerator.generate(fromRoot: self.generator.rootComponent) else { return }
             try? FileManager.default.removeItem(at: self.url)
             FileManager.default.createFile(atPath: self.url.path, contents: data, attributes: nil)
-            guard let rootComponent = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? Component else { return }
         }
     }
 

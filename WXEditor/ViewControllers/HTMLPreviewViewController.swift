@@ -27,13 +27,8 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
     }
     
     func reload() {
-        let contentOffset = webView.scrollView.contentOffset
-        let zoomScale = webView.scrollView.zoomScale
-        let contentInset = webView.scrollView.contentInset
+        self.contentOffset = webView.scrollView.contentOffset
         loadHTML()
-        webView.scrollView.setZoomScale(zoomScale, animated: true)
-        webView.scrollView.contentInset = contentInset
-        webView.scrollView.setContentOffset(contentOffset, animated: true)
     }
     
     func loadHTML() {
@@ -42,13 +37,13 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("here")
-        if let offset = contentOffset {
-
-            webView.scrollView.setContentOffset(offset, animated: true)
-            contentOffset = nil
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
+            if let contentOffset = self.contentOffset {
+                self.webView.scrollView.setContentOffset(contentOffset, animated: false)
+            }
         }
     }
+    
     
     init(generator: HTMLGenerator) {
         self.generator = generator
