@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E37CED0252B20BE0000159D /* tutorial.wedoc in Resources */ = {isa = PBXBuildFile; fileRef = 0E37CECF252B20BE0000159D /* tutorial.wedoc */; };
+		0E37CED5252B25060000159D /* MyTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E37CED4252B25060000159D /* MyTextEditor.swift */; };
+		0E37CED9252B255E0000159D /* TextEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E37CED8252B255E0000159D /* TextEditorViewController.swift */; };
 		0E3BB03E25297D22004DE5AD /* ComponentEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E3BB03D25297D22004DE5AD /* ComponentEditorViewController.swift */; };
 		0E9238E42528C2B800571918 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E9238E32528C2B800571918 /* TableView.swift */; };
 		0E9238EA2528E1AE00571918 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 0E9238E92528E1AE00571918 /* style.css */; };
@@ -47,6 +50,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E37CECF252B20BE0000159D /* tutorial.wedoc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = tutorial.wedoc; sourceTree = "<group>"; };
+		0E37CED4252B25060000159D /* MyTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTextEditor.swift; sourceTree = "<group>"; };
+		0E37CED8252B255E0000159D /* TextEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditorViewController.swift; sourceTree = "<group>"; };
 		0E3BB03D25297D22004DE5AD /* ComponentEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentEditorViewController.swift; sourceTree = "<group>"; };
 		0E9238E32528C2B800571918 /* TableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
 		0E9238E62528D14800571918 /* WXEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WXEditor.entitlements; sourceTree = "<group>"; };
@@ -100,11 +106,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0E37CED3252B24E90000159D /* Intergration */ = {
+			isa = PBXGroup;
+			children = (
+				0E37CED4252B25060000159D /* MyTextEditor.swift */,
+				0E37CED8252B255E0000159D /* TextEditorViewController.swift */,
+			);
+			path = Intergration;
+			sourceTree = "<group>";
+		};
 		0EAF0CDB252895CA00F552E6 /* Support */ = {
 			isa = PBXGroup;
 			children = (
 				0EAF0CDC252895DA00F552E6 /* UIColor+tint.swift */,
 				0E9238E92528E1AE00571918 /* style.css */,
+				0E37CECF252B20BE0000159D /* tutorial.wedoc */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -210,6 +226,7 @@
 		0ED9D5A3252875B900C5FB76 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0E37CED3252B24E90000159D /* Intergration */,
 				0EAF0CF82528C18700F552E6 /* Modifiers */,
 				0EAF0CE02528C16600F552E6 /* Components */,
 				0ED9D5A4252875C500C5FB76 /* ComponentEditorView.swift */,
@@ -279,6 +296,7 @@
 				0E9238EA2528E1AE00571918 /* style.css in Resources */,
 				0ED9D589252859BC00C5FB76 /* Assets.xcassets in Resources */,
 				0ED9D587252859BB00C5FB76 /* Main.storyboard in Resources */,
+				0E37CED0252B20BE0000159D /* tutorial.wedoc in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,6 +309,7 @@
 			files = (
 				0EAF0CF42528C16600F552E6 /* LabelButtonView.swift in Sources */,
 				0ED9D584252859BB00C5FB76 /* HTMLPreviewViewController.swift in Sources */,
+				0E37CED9252B255E0000159D /* TextEditorViewController.swift in Sources */,
 				0ED9D59625285A2F00C5FB76 /* Component.swift in Sources */,
 				0EAF0D052528C18700F552E6 /* Disabled.swift in Sources */,
 				0E9238E42528C2B800571918 /* TableView.swift in Sources */,
@@ -300,6 +319,7 @@
 				0EAF0CF02528C16600F552E6 /* ListCell.swift in Sources */,
 				0EC771B0252A0B7E00F24032 /* FileViewController.swift in Sources */,
 				0EAF0D022528C18700F552E6 /* CellModifier.swift in Sources */,
+				0E37CED5252B25060000159D /* MyTextEditor.swift in Sources */,
 				0EAF0D062528C18700F552E6 /* Layout.swift in Sources */,
 				0ED9D5A1252874CF00C5FB76 /* MainSplitViewController.swift in Sources */,
 				0EAF0CEE2528C16600F552E6 /* Spinner.swift in Sources */,
@@ -470,7 +490,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = WXEditor/WXEditor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1000;
+				CURRENT_PROJECT_VERSION = 1001;
 				DEVELOPMENT_TEAM = C5UH93T368;
 				INFOPLIST_FILE = WXEditor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -492,7 +512,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = WXEditor/WXEditor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1000;
+				CURRENT_PROJECT_VERSION = 1001;
 				DEVELOPMENT_TEAM = C5UH93T368;
 				INFOPLIST_FILE = WXEditor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

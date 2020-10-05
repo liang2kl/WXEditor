@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ComponentEditorView: View {
     @ObservedObject var componentState: ComponentState
+    var isTutorial: Bool = false
     var viewController: ComponentEditorViewController?
     var body: some View {
         VStack {
@@ -65,6 +66,7 @@ struct ComponentEditorView: View {
             .padding()
         }
         .animation(.spring())
+        .disabled(isTutorial)
     }
 }
 

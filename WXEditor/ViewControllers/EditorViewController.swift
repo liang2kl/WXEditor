@@ -10,8 +10,9 @@ import UIKit
 class EditorViewController: UICollectionViewController {
     
     var url: URL
+    var isTutorial: Bool
     
-    init(url: URL) {
+    init(url: URL, isTutorial: Bool = false) {
         _ = url.startAccessingSecurityScopedResource()
         let file = FileHandle(forReadingAtPath: url.path)
         url.stopAccessingSecurityScopedResource()
@@ -20,6 +21,7 @@ class EditorViewController: UICollectionViewController {
         
         self.generator = HTMLGenerator(rootComponent: rootComponent)
         self.url = url
+        self.isTutorial = isTutorial
         super.init(collectionViewLayout: UICollectionViewLayout())
     }
     
@@ -62,11 +64,15 @@ class EditorViewController: UICollectionViewController {
 
 extension EditorViewController {
     func configureNavItem() {
-        navigationItem.title = NSLocalizedString("Editor", comment: "")
-        navigationItem.rightBarButtonItems = [
-            getAddButton(),
-            editButtonItem
-        ]
+        if !isTutorial {
+            navigationItem.title = NSLocalizedString("Editor", comment: "")
+            navigationItem.rightBarButtonItems = [
+                getAddButton(),
+                editButtonItem
+            ]
+        } else {
+            navigationItem.title = NSLocalizedString("Tutorial", comment: "")
+        }
     }
     
     private func getAddButton() -> UIBarButtonItem {
@@ -97,6 +103,7 @@ extension EditorViewController {
             guard let _ = DataSection(rawValue: sectionIndex) else { return nil }
             var configuration = UICollectionLayoutListConfiguration(appearance: .sidebar)
             configuration.trailingSwipeActionsConfigurationProvider = { indexPath in
+                if self.isTutorial { return nil }
                 guard let item = self.dataSource.itemIdentifier(for: indexPath) else { return nil }
                 return self.trailingSwipeActionsConfigurationForProjectCellItem(item: item)
             }
@@ -119,9 +126,13 @@ extension EditorViewController {
             cell.tintColor = .tint
             cell.accessories = [
                 .label(text: item.type.head),
-                .reorder(),
-                .delete()
             ]
+            if !self.isTutorial {
+                cell.accessories += [
+//                    .reorder(),
+                    .delete()
+                ]
+            }
             if item.hasChild {
                 cell.accessories += [
                     .outlineDisclosure(options: .init(style: .cell))
@@ -153,7 +164,7 @@ extension EditorViewController {
         let snapShots = getSnapShot()
         dataSource.apply(snapShots, to: section)
         if let indexPath = indexPath {
-            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .bottom)
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredVertically)
         }
     }
 
@@ -209,7 +220,7 @@ extension EditorViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
         guard let component = getComponent(id: item.id, rootComponent: generator.rootComponent) else { return }
-        let componentEditorVc = ComponentEditorViewController(component: component)
+        let componentEditorVc = ComponentEditorViewController(component: component, isTutorial: isTutorial)
         splitViewController?.setViewController(componentEditorVc, for: .supplementary)
     }
     
@@ -256,7 +267,7 @@ extension EditorViewController {
         let item = Item(component: newComponent)
         let indexPath = dataSource.indexPath(for: item)!
         collectionView(collectionView, didSelectItemAt: indexPath)
-        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .bottom)
+        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
     }
     
     func updateHTML() {
@@ -266,10 +277,12 @@ extension EditorViewController {
     }
     
     func saveDocument() {
-        DispatchQueue.global(qos: .background).async {
-            guard let data = FileGenerator.generate(fromRoot: self.generator.rootComponent) else { return }
-            try? FileManager.default.removeItem(at: self.url)
-            FileManager.default.createFile(atPath: self.url.path, contents: data, attributes: nil)
+        if !isTutorial {
+            DispatchQueue.global(qos: .background).async {
+                guard let data = FileGenerator.generate(fromRoot: self.generator.rootComponent) else { return }
+                try? FileManager.default.removeItem(at: self.url)
+                FileManager.default.createFile(atPath: self.url.path, contents: data, attributes: nil)
+            }
         }
     }
 

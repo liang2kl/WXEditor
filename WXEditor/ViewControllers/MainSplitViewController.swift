@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-class MainSplitViewController: UISplitViewController {
+class MainSplitViewController: UISplitViewController, UISplitViewControllerDelegate {
     static let blankViewController = UIHostingController<BlankView>(rootView: BlankView())
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,6 +17,9 @@ class MainSplitViewController: UISplitViewController {
         setViewController(FileViewController.defaultController, for: .primary)
         setViewController(HTMLPreviewViewController(generator: generator), for: .secondary)
         setViewController(MainSplitViewController.blankViewController, for: .supplementary)
+        delegate = self
+        presentsWithGesture = false
+        
     }
     
     init() {

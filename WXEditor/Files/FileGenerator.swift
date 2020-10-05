@@ -20,7 +20,7 @@ struct FileGenerator {
     
     static func read(_ data: Data) -> Component? {
         do {
-            guard let rootComponent = try? JSONDecoder().decode(Component.self, from: data) else { return nil }
+            let rootComponent = try JSONDecoder().decode(Component.self, from: data)
             return rootComponent
         } catch {
             print(error)

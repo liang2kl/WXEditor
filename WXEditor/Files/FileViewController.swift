@@ -72,7 +72,7 @@ class FileViewController: UICollectionViewController {
     func createLayout() -> UICollectionViewLayout {
         let sectionProvider = { (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
             guard let _ = Section(rawValue: sectionIndex) else { return nil }
-            var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
+            var configuration = UICollectionLayoutListConfiguration(appearance: .sidebar)
             configuration.trailingSwipeActionsConfigurationProvider = { indexPath in
                 guard let item = self.dataSource.itemIdentifier(for: indexPath) else { return nil }
                 return self.trailingSwipeActionsConfigurationForProjectCellItem(item: item)
@@ -89,7 +89,8 @@ class FileViewController: UICollectionViewController {
     }
     
     func configureNavItem() {
-        navigationItem.title = url.lastPathComponent
+        navigationItem.title = NSLocalizedString("Documents", comment: "")
+        navigationItem.backButtonTitle = ""
         navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.prefersLargeTitles = true
         let addFileButton = UIBarButtonItem(systemItem: .add, menu: UIMenu(title: "", children: [
@@ -102,6 +103,7 @@ class FileViewController: UICollectionViewController {
         ]))
 
         navigationItem.rightBarButtonItems = [addFileButton]
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "info"), style: .plain, target: self, action: #selector(showTutorial))
         
         let items: [UIBarButtonItem] = [
             UIBarButtonItem(image: UIImage(systemName: "trash"), style: .plain, target: self, action: #selector(deleteSelectedItmes))
@@ -332,6 +334,12 @@ class FileViewController: UICollectionViewController {
             print(error)
             return nil
         }
+    }
+    
+    @objc func showTutorial() {
+        let url = Bundle.main.url(forResource: "tutorial", withExtension: "wedoc")!
+        let vc = EditorViewController(url: url, isTutorial: true)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 extension FileViewController {

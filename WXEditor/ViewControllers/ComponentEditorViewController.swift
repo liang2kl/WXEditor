@@ -10,15 +10,19 @@ import SwiftUI
 class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     var component: Component
     var componentState: ComponentState
+    var isTutorial: Bool
     
-    init(component: Component) {
+    init(component: Component, isTutorial: Bool = false) {
+        self.isTutorial = isTutorial
         self.component = component
         self.componentState = ComponentState(component: component)
-        super.init(rootView: ComponentEditorView(componentState: componentState))
+        super.init(rootView: ComponentEditorView(componentState: componentState, isTutorial: isTutorial))
         componentState.viewController = self
         rootView.viewController = self
         navigationItem.title = NSLocalizedString("Element Editor", comment: "")
-        navigationItem.rightBarButtonItem = getAddButton()
+        if !isTutorial {
+            navigationItem.rightBarButtonItem = getAddButton()
+        }
     }
     
     @objc required dynamic init?(coder aDecoder: NSCoder) {
@@ -26,6 +30,7 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     }
     
     func updateComponent(component: Component, type: HTMLComponent, className: String, string: String?, refreshSideBar: Bool) {
+        guard !isTutorial else { return }
         let childs = component.childs
         let id = component.id
         let parent = component.parent!
@@ -42,6 +47,7 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     }
     
     func updateSideBar() {
+        guard !isTutorial else { return }
         guard let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController else { return }
         editorVc.applySnapshots()
         editorVc.saveDocument()
@@ -49,6 +55,7 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     
     
     func updatePreview() {
+        guard !isTutorial else { return }
         guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
               let previewVc = navVc.topViewController as? HTMLPreviewViewController else { return }
         previewVc.reload()
@@ -66,6 +73,7 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     }
     
     func addComponent(type: HTMLComponent) {
+        guard !isTutorial else { return }
         var newComponent: Component
         let rootComponent = component
         newComponent = Component(type: type, parent: rootComponent)
@@ -75,11 +83,12 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
             let item = EditorViewController.Item(component: newComponent)
             let indexPath = editorVc.dataSource.indexPath(for: item)!
             editorVc.collectionView(editorVc.collectionView, didSelectItemAt: indexPath)
-            editorVc.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .bottom)
+            editorVc.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
         }
     }
     
     func update(id: UUID) {
+        guard !isTutorial else { return }
         guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
               let previewVc = navVc.topViewController as? HTMLPreviewViewController,
               let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController else { return }

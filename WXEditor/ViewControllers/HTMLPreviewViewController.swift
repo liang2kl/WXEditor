@@ -18,6 +18,7 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.uiDelegate = self
         webView.navigationDelegate = self
+        webView.allowsBackForwardNavigationGestures = true
         view = webView
     }
     override func viewDidLoad() {
