@@ -17,7 +17,7 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         super.init(rootView: ComponentEditorView(componentState: componentState))
         componentState.viewController = self
         rootView.viewController = self
-        navigationItem.title = NSLocalizedString("Component Editor", comment: "")
+        navigationItem.title = NSLocalizedString("Element Editor", comment: "")
         navigationItem.rightBarButtonItem = getAddButton()
     }
     
@@ -28,32 +28,23 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     func updateComponent(component: Component, type: HTMLComponent, className: String, string: String?) {
         let childs = component.childs
         let id = component.id
-        var parent = component.parent!
-        print("iddd", component.id)
-        print("iddd", parent.id)
-        switch type {
-        case .blockquote: self.component = BlockQuote(id: id, className: className, childs: childs, string: string, parent: parent)
-        case .br: self.component = BR(id: id, childs: childs, parent: parent)
-        case .h1: self.component = H1(id: id, className: className, childs: childs, string: string, parent: parent)
-        case .h2: self.component = H2(id: id, className: className, childs: childs, string: string, parent: parent)
-        case .hr: self.component = HR(id: id, className: className, childs: childs, parent: parent)
-        case .img: self.component = IMG(url: string ?? "", id: id, className: className, childs: childs, parent: parent)
-        case .p: self.component = P(id: id, className: className, childs: childs, string: string, parent: parent)
-        case .section: self.component = Section(id: id, className: className, childs: childs, string: string, parent: parent)
-        case .span: self.component = Span(id: id, className: className, childs: childs, string: string, parent: parent)
-        }
-        print(component)
+        let parent = component.parent!
+        self.component = Component(type: type, id: id, className: className, childs: childs, string: string, parent: parent)
         let originalComponentIndex = parent.childs.firstIndex(where: {$0.id == id})!
-        parent.childs.remove(at: originalComponentIndex)
-        parent.childs.insert(self.component, at: originalComponentIndex)
-        print(self.component)
+        parent.remove(at: originalComponentIndex)
+        parent.insert(self.component, at: originalComponentIndex)
+        for index in 0..<childs.count {
+            self.component.childs[index].parent = self.component
+        }
         updateSideBar()
     }
     
     func updateSideBar() {
         guard let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController else { return }
         editorVc.applySnapshots()
+        editorVc.saveDocument()
     }
+    
     
     func updatePreview() {
         guard let previewVc = splitViewController?.viewController(for: .secondary) as? HTMLPreviewViewController else { return }
@@ -62,7 +53,7 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     
     private func getAddButton() -> UIBarButtonItem {
         var children: [UIAction] = []
-        for component in HTMLComponent.allCases {
+        for component in HTMLComponent.allCases where component != .root {
             children.append(UIAction(title: component.head, image: UIImage(systemName: component.imageName)) { _ in
                 self.addComponent(type: component)
             })
@@ -73,36 +64,24 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     
     func addComponent(type: HTMLComponent) {
         var newComponent: Component
-        var rootComponent = component
-        switch type {
-        case .h1:
-            newComponent = H1(parent: rootComponent)
-        case .h2:
-            newComponent = H2(parent: rootComponent)
-        case .blockquote:
-            newComponent = BlockQuote(parent: rootComponent)
-        case .br:
-            newComponent = BR(parent: rootComponent)
-        case .hr:
-            newComponent = HR(parent: rootComponent)
-        case .img:
-            newComponent = IMG(parent: rootComponent)
-        case .section:
-            newComponent = Section(parent: rootComponent)
-        case .p:
-            newComponent = P(parent: rootComponent)
-        case .span:
-            newComponent = Span(parent: rootComponent)
-        }
+        let rootComponent = component
+        newComponent = Component(type: type, parent: rootComponent)
         rootComponent.append(newComponent)
-        update()
+        update(id: newComponent.id)
+        if let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController {
+            let item = EditorViewController.Item(component: newComponent)
+            let indexPath = editorVc.dataSource.indexPath(for: item)!
+            editorVc.collectionView(editorVc.collectionView, didSelectItemAt: indexPath)
+            editorVc.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .bottom)
+        }
     }
     
-    func update() {
+    func update(id: UUID) {
         guard let previewVc = splitViewController?.viewController(for: .secondary) as? HTMLPreviewViewController,
               let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController else { return }
         previewVc.reload()
         editorVc.applySnapshots()
+        editorVc.saveDocument()
     }
 
 

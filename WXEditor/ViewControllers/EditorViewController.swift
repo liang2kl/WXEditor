@@ -9,8 +9,17 @@ import UIKit
 
 class EditorViewController: UICollectionViewController {
     
-    init(generator: HTMLGenerator) {
-        self.generator = generator
+    var url: URL
+    
+    init(url: URL) {
+        _ = url.startAccessingSecurityScopedResource()
+        let file = FileHandle(forReadingAtPath: url.path)
+        url.stopAccessingSecurityScopedResource()
+        let data = file!.readDataToEndOfFile()
+        let rootComponent = (try! JSONDecoder().decode(Component.self, from: data))
+        
+        self.generator = HTMLGenerator(rootComponent: rootComponent)
+        self.url = url
         super.init(collectionViewLayout: UICollectionViewLayout())
     }
     
@@ -46,6 +55,7 @@ class EditorViewController: UICollectionViewController {
         configureNavItem()
         configureDataSource()
         applySnapshots(initial: true)
+        configurePreview()
     }
 
 }
@@ -61,7 +71,7 @@ extension EditorViewController {
     
     private func getAddButton() -> UIBarButtonItem {
         var children: [UIAction] = []
-        for component in HTMLComponent.allCases {
+        for component in HTMLComponent.allCases where component != .root {
             children.append(UIAction(title: component.head, image: UIImage(systemName: component.imageName)) { _ in
                 self.addComponent(type: component)
             })
@@ -73,6 +83,10 @@ extension EditorViewController {
     func configureHierarchy() {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: createLayout())
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    }
+    
+    func configurePreview() {
+        (splitViewController?.viewController(for: .secondary) as? HTMLPreviewViewController)?.generator = generator
     }
 
     func createLayout() -> UICollectionViewLayout {
@@ -119,17 +133,25 @@ extension EditorViewController {
             (collectionView, indexPath, item) -> UICollectionViewCell? in
             return collectionView.dequeueConfiguredReusableCell(using: self.configuredOutlineCell(), for: indexPath, item: item)
         }
+        // Allow every item to be reordered
+        dataSource.reorderingHandlers.canReorderItem = { item in return true }
+
+        // Option 1: Update the backing store from a CollectionDifference
+        dataSource.reorderingHandlers.didReorder = { transaction in
+        }
     }
     
     func applySnapshots(initial: Bool = false) {
-        // Order of the section
+        let indexPath = collectionView.indexPathsForSelectedItems?.first
         let section = DataSection.main
         var snapShot = NSDiffableDataSourceSnapshot<DataSection, Item>()
         snapShot.appendSections([section])
         dataSource.apply(snapShot, animatingDifferences: !initial)
         let snapShots = getSnapShot()
         dataSource.apply(snapShots, to: section)
-        
+        if let indexPath = indexPath {
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .bottom)
+        }
     }
 
 
@@ -173,9 +195,10 @@ extension EditorViewController {
     }
     
     func deleteItem(_ id: UUID) {
-        guard var component = getComponent(id: id, rootComponent: generator.rootComponent) else { return }
+        guard let component = getComponent(id: id, rootComponent: generator.rootComponent) else { return }
         component.parent!.remove(id: id)
         applySnapshots()
+        splitViewController?.setViewController(MainSplitViewController.blankViewController, for: .supplementary)
     }
 }
 
@@ -221,35 +244,30 @@ extension EditorViewController {
 
 extension EditorViewController {
     func addComponent(type: HTMLComponent) {
-        var newComponent: Component
-        var rootComponent = generator.rootComponent
-        switch type {
-        case .h1:
-            newComponent = H1(parent: rootComponent)
-        case .h2:
-            newComponent = H2(parent: rootComponent)
-        case .blockquote:
-            newComponent = BlockQuote(parent: rootComponent)
-        case .br:
-            newComponent = BR(parent: rootComponent)
-        case .hr:
-            newComponent = HR(parent: rootComponent)
-        case .img:
-            newComponent = IMG(parent: rootComponent)
-        case .section:
-            newComponent = Section(parent: rootComponent)
-        case .p:
-            newComponent = P(parent: rootComponent)
-        case .span:
-            newComponent = Span(parent: rootComponent)
-        }
+        let rootComponent = generator.rootComponent
+        let newComponent: Component = Component(type: type, parent: rootComponent)
         rootComponent.append(newComponent)
         applySnapshots()
+        saveDocument()
         updateHTML()
+        let item = Item(component: newComponent)
+        let indexPath = dataSource.indexPath(for: item)!
+        collectionView(collectionView, didSelectItemAt: indexPath)
+        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .bottom)
     }
     
     func updateHTML() {
         guard let vc = splitViewController?.viewController(for: .secondary) as? HTMLPreviewViewController else { return }
         vc.reload()
     }
+    
+    func saveDocument() {
+        DispatchQueue.global(qos: .background).async {
+            guard let data = FileGenerator.generate(fromRoot: self.generator.rootComponent) else { return }
+            try? FileManager.default.removeItem(at: self.url)
+            FileManager.default.createFile(atPath: self.url.path, contents: data, attributes: nil)
+            guard let rootComponent = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? Component else { return }
+        }
+    }
+
 }

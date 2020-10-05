@@ -10,7 +10,7 @@ import Foundation
 enum HTMLComponent: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
     
-    case p, span, section, h1, h2, blockquote, img, br, hr
+    case p, span, section, h1, h2, blockquote, img, footer, br, hr, root
     var head: String {
         switch self {
         case .p: return "p"
@@ -20,8 +20,10 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .h2: return "h2"
         case .blockquote: return "blockquote"
         case .img: return "img"
+        case .footer: return "footer"
         case .br: return "br"
         case .hr: return "hr"
+        case .root: return "root"
         }
     }
     var tail: String? {
@@ -32,9 +34,11 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .h1: return "h1"
         case .h2: return "h2"
         case .blockquote: return "blockquote"
+        case .footer: return "footer"
         case .img: return nil
         case .br: return nil
         case .hr: return nil
+        case .root: return nil
         }
     }
     var imageName: String {
@@ -48,24 +52,37 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .section: return "square.dashed"
         case .p: return "paragraphsign"
         case .span: return "text.justify"
+        case .root: return ""
+        case .footer: return "text.append"
         }
     }
 
 }
 
-protocol Component {
-    var id: UUID { get set }
-    var className: String { get set }
-    var childs: [Component] { get set }
-    var parent: Component? { get set }
-    var string: String? { get set }
-    var htmlComponent: HTMLComponent { get }
-    func makeComponent() -> String
-}
+class Component: NSObject, Codable {
+    var id: UUID = UUID()
+    var className: String = ""
+    var childs: [Component] = []
+    var parent: Component?
+    var string: String?
+    var htmlComponent: HTMLComponent = .p
+    var nestedInFront = false
+    
+    init(type: HTMLComponent, id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component?) {
+        self.id = id
+        self.childs = childs
+        self.string = string
+        self.parent = parent
+        self.className = className
+        self.htmlComponent = type
+    }
 
-extension Component {
-    var nestedInFront: Bool { false }
+    
     func makeComponent() -> String {
+        let className = self.className == "" ? "" : " class=\"\(self.className)\" "
+        if self.htmlComponent == .img {
+            return "<img\(className)src=\"\(string ?? "")\">"
+        }
         var frontString = ""
         var backString = ""
         if htmlComponent != .img &&
@@ -82,181 +99,58 @@ extension Component {
                 backString.append(string)
             }
         }
-        let className = self.className == "" ? "" : "class=\"\(self.className)\""
         return
             "<\(htmlComponent.head + className)>" +
             frontString +
             "\(string ?? "")" +
             backString +
             "\(htmlComponent.tail != nil ? "</\(htmlComponent.tail!)>" : "")"
+
     }
     
-    mutating func append(_ newComponent: Component) {
+    func append(_ newComponent: Component) {
         childs.append(newComponent)
     }
     
-    mutating func remove(id: UUID) {
+    func remove(id: UUID) {
         guard let index = childs.firstIndex(where: {$0.id == id}) else { return }
         childs.remove(at: index)
     }
-}
-
-class RootComponent: Component {
-    var id: UUID = UUID()
-    var className: String = ""
-    var childs: [Component]
-    var parent: Component? = nil
-    var string: String?
-    var htmlComponent: HTMLComponent = .hr
     
-    init(childs: [Component]) {
-        self.childs = childs
-    }
-}
-
-class P: Component {
-    var id: UUID
-    var className: String
-    var childs: [Component]
-    var parent: Component?
-    var string: String?
-    var htmlComponent: HTMLComponent = .p
-    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
-        self.id = id
-        self.childs = childs
-        self.string = string
-        self.parent = parent
-        self.className = className
-    }
-}
-
-class Section: Component {
-    var id: UUID
-    var className: String
-    var childs: [Component]
-    var parent: Component?
-    var string: String?
-    var htmlComponent: HTMLComponent = .section
-    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
-        self.id = id
-        self.childs = childs
-        self.string = string
-        self.parent = parent
-        self.className = className
-    }
-}
-
-class Span: Component {
-    var id: UUID
-    var className: String
-    var childs: [Component]
-    var parent: Component?
-    var string: String?
-    var htmlComponent: HTMLComponent = .span
-    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
-        self.id = id
-        self.childs = childs
-        self.string = string
-        self.parent = parent
-        self.className = className
-    }
-}
-
-class H1: Component {
-    var id: UUID
-    var className: String
-    var childs: [Component]
-    var parent: Component?
-    var string: String?
-    var htmlComponent: HTMLComponent = .h1
-    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
-        self.id = id
-        self.childs = childs
-        self.string = string
-        self.parent = parent
-        self.className = className
-    }
-}
-
-class H2: Component {
-    var id: UUID
-    var className: String
-    var childs: [Component]
-    var parent: Component?
-    var string: String?
-    var htmlComponent: HTMLComponent = .h2
-    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
-        self.id = id
-        self.childs = childs
-        self.string = string
-        self.parent = parent
-        self.className = className
-    }
-}
-
-class BlockQuote: Component {
-    var id: UUID
-    var className: String
-    var childs: [Component]
-    var parent: Component?
-    var string: String?
-    var htmlComponent: HTMLComponent = .blockquote
-    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component) {
-        self.id = id
-        self.childs = childs
-        self.string = string
-        self.parent = parent
-        self.className = className
-    }
-}
-
-class IMG: Component {
-    var id: UUID = UUID()
-    var className: String
-    var childs: [Component] = []
-    var parent: Component?
-    var string: String?
-    var htmlComponent: HTMLComponent = .img
-    func makeComponent() -> String {
-        let className = self.className == "" ? "" : "class=\"\(self.className)\""
-        print("<img \(className) src=\"\(string ?? "")\">")
-        return "<img \(className) src=\"\(string ?? "")\">"
+    func remove(at index: Int) {
+        childs.remove(at: index)
     }
     
-    init(url: String = "", id: UUID = UUID(), className: String = "", childs: [Component] = [], parent: Component) {
-        self.string = url
-        self.id = id
-        self.childs = childs
-        self.parent = parent
-        self.className = className
+    func insert(_ child: Component, at index: Int) {
+        childs.insert(child, at: index)
     }
+
+    enum CodingKeys: CodingKey {
+        case className, childs, parent, string, type, front
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(className, forKey: .className)
+        try container.encode(childs, forKey: .childs)
+        try container.encode(string, forKey: .string)
+        try container.encode(htmlComponent.rawValue, forKey: .type)
+        try container.encode(nestedInFront, forKey: .front)
+    }
+
+    required init(from decoder: Decoder) throws {
+        super.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        className = try values.decode(String.self, forKey: .className)
+        childs = try values.decode([Component].self, forKey: .childs)
+        string = try values.decode((String?).self, forKey: .string)
+        htmlComponent = HTMLComponent(rawValue: try values.decode(Int.self, forKey: .type))!
+        nestedInFront = try values.decode(Bool.self, forKey: .front)
+        for child in childs {
+            child.parent = self
+        }
+    }
+
 }
 
-class BR: Component {
-    var id: UUID
-    var childs: [Component] = []
-    var className: String = ""
-    var parent: Component?
-    var string: String? = nil
-    var htmlComponent: HTMLComponent = .br
-    init(id: UUID = UUID(), childs: [Component] = [], parent: Component) {
-        self.id = id
-        self.parent = parent
-        self.childs = childs
-    }
-}
 
-class HR: Component {
-    var id: UUID
-    var className: String
-    var childs: [Component] = []
-    var parent: Component?
-    var string: String? = nil
-    var htmlComponent: HTMLComponent = .hr
-    init(id: UUID = UUID(), className: String = "", childs: [Component] = [], parent: Component) {
-        self.id = id
-        self.parent = parent
-        self.childs = childs
-        self.className = className
-    }
-}

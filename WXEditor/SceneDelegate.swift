@@ -49,6 +49,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
+    
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        // save importing files
+        var urls = [URL]()
+        for urlContext in URLContexts {
+            urls.append(urlContext.url)
+        }
+        
+        let fileManager = MyFileManager(url: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!)
+        do {
+            try fileManager.addFiles(urls, type: .copy)
+        } catch {
+            print(error)
+        }
+        
+        if let window = self.window,
+           let rootViewController = window.rootViewController as? MainSplitViewController,
+           let fileVc = rootViewController.viewController(for: .primary) as? FileViewController {
+            fileVc.applySnapShots()
+        }
+    }
 
 
 }

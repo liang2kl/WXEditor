@@ -15,8 +15,10 @@ struct ComponentEditorView: View {
             TableSection(title: NSLocalizedString("Type", comment: "")) {
                 Picker("", selection: $componentState.type) {
                     ForEach(HTMLComponent.allCases) { componentType in
-                        Label(componentType.head, systemImage: componentType.imageName)
-                            .tag(componentType)
+                        if componentType != .root {
+                            Label(componentType.head, systemImage: componentType.imageName)
+                                .tag(componentType)
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -27,11 +29,12 @@ struct ComponentEditorView: View {
                         .font(.title2)
                         .bold()
                         .padding(.leading)
-                    TextField("", text: $componentState.className)
+                    TextField("No Class", text: $componentState.className)
                         .padding(3)
                         .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
                         .padding(.trailing)
                         .labelsHidden()
+                        .keyboardType(.default)
                 }
                 .padding(.top)
             }
@@ -42,13 +45,14 @@ struct ComponentEditorView: View {
                         .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
                         .padding(.horizontal)
                         .frame(minHeight: 40)
+                        .keyboardType(.default)
                 }
             }
             Spacer()
             if componentState.type == .br ||
                 componentState.type == .hr ||
                 componentState.type == .img {
-                Text(NSLocalizedString("Children will be ignored in this component.", comment: ""))
+                Text(NSLocalizedString("Children will be ignored in this element.", comment: ""))
                     .padding(.horizontal)
                     .padding(.top)
             }
@@ -57,6 +61,7 @@ struct ComponentEditorView: View {
             }) {
                 Label(NSLocalizedString("Update Preview", comment: ""), systemImage: "arrow.2.squarepath")
             }
+            .animation(.none)
             .padding()
         }
         .animation(.spring())

@@ -30,6 +30,10 @@
 		0EAF0D092528C18700F552E6 /* Stroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0D002528C18700F552E6 /* Stroke.swift */; };
 		0EAF0D0A2528C18700F552E6 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0D012528C18700F552E6 /* CardModifier.swift */; };
 		0EC771A82529C0E200F24032 /* BlankView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC771A72529C0E200F24032 /* BlankView.swift */; };
+		0EC771AD252A0B7800F24032 /* MyFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC771AC252A0B7800F24032 /* MyFileManager.swift */; };
+		0EC771B0252A0B7E00F24032 /* FileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC771AF252A0B7E00F24032 /* FileViewController.swift */; };
+		0EC771B3252A0BA200F24032 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC771B2252A0BA200F24032 /* Global.swift */; };
+		0EC771B6252A0E3100F24032 /* FileGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC771B5252A0E3100F24032 /* FileGenerator.swift */; };
 		0ED9D580252859BB00C5FB76 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED9D57F252859BB00C5FB76 /* AppDelegate.swift */; };
 		0ED9D582252859BB00C5FB76 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED9D581252859BB00C5FB76 /* SceneDelegate.swift */; };
 		0ED9D584252859BB00C5FB76 /* HTMLPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED9D583252859BB00C5FB76 /* HTMLPreviewViewController.swift */; };
@@ -67,6 +71,10 @@
 		0EAF0D002528C18700F552E6 /* Stroke.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stroke.swift; sourceTree = "<group>"; };
 		0EAF0D012528C18700F552E6 /* CardModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardModifier.swift; sourceTree = "<group>"; };
 		0EC771A72529C0E200F24032 /* BlankView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlankView.swift; sourceTree = "<group>"; };
+		0EC771AC252A0B7800F24032 /* MyFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyFileManager.swift; sourceTree = "<group>"; };
+		0EC771AF252A0B7E00F24032 /* FileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileViewController.swift; sourceTree = "<group>"; };
+		0EC771B2252A0BA200F24032 /* Global.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
+		0EC771B5252A0E3100F24032 /* FileGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileGenerator.swift; sourceTree = "<group>"; };
 		0ED9D57C252859BB00C5FB76 /* WXEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WXEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0ED9D57F252859BB00C5FB76 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0ED9D581252859BB00C5FB76 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -133,6 +141,16 @@
 			path = Modifiers;
 			sourceTree = "<group>";
 		};
+		0EC771AB252A0B6F00F24032 /* Files */ = {
+			isa = PBXGroup;
+			children = (
+				0EC771AC252A0B7800F24032 /* MyFileManager.swift */,
+				0EC771AF252A0B7E00F24032 /* FileViewController.swift */,
+				0EC771B5252A0E3100F24032 /* FileGenerator.swift */,
+			);
+			path = Files;
+			sourceTree = "<group>";
+		};
 		0ED9D573252859BB00C5FB76 = {
 			isa = PBXGroup;
 			children = (
@@ -152,10 +170,12 @@
 		0ED9D57E252859BB00C5FB76 /* WXEditor */ = {
 			isa = PBXGroup;
 			children = (
-				0E9238E62528D14800571918 /* WXEditor.entitlements */,
+				0EC771AB252A0B6F00F24032 /* Files */,
 				0ED9D5A3252875B900C5FB76 /* Views */,
 				0ED9D59F252874AB00C5FB76 /* ViewControllers */,
 				0ED9D594252859FF00C5FB76 /* Model */,
+				0E9238E62528D14800571918 /* WXEditor.entitlements */,
+				0EC771B2252A0BA200F24032 /* Global.swift */,
 				0ED9D57F252859BB00C5FB76 /* AppDelegate.swift */,
 				0ED9D581252859BB00C5FB76 /* SceneDelegate.swift */,
 				0ED9D585252859BB00C5FB76 /* Main.storyboard */,
@@ -274,9 +294,11 @@
 				0ED9D59625285A2F00C5FB76 /* Component.swift in Sources */,
 				0EAF0D052528C18700F552E6 /* Disabled.swift in Sources */,
 				0E9238E42528C2B800571918 /* TableView.swift in Sources */,
+				0EC771B6252A0E3100F24032 /* FileGenerator.swift in Sources */,
 				0EAF0D032528C18700F552E6 /* GradientMask.swift in Sources */,
 				0EAF0D082528C18700F552E6 /* TopBarViewModifier.swift in Sources */,
 				0EAF0CF02528C16600F552E6 /* ListCell.swift in Sources */,
+				0EC771B0252A0B7E00F24032 /* FileViewController.swift in Sources */,
 				0EAF0D022528C18700F552E6 /* CellModifier.swift in Sources */,
 				0EAF0D062528C18700F552E6 /* Layout.swift in Sources */,
 				0ED9D5A1252874CF00C5FB76 /* MainSplitViewController.swift in Sources */,
@@ -284,6 +306,7 @@
 				0EAF0CD92528922900F552E6 /* EditorViewController.swift in Sources */,
 				0ED9D5A5252875C500C5FB76 /* ComponentEditorView.swift in Sources */,
 				0EAF0CF32528C16600F552E6 /* CircularButton.swift in Sources */,
+				0EC771AD252A0B7800F24032 /* MyFileManager.swift in Sources */,
 				0EC771A82529C0E200F24032 /* BlankView.swift in Sources */,
 				0ED9D580252859BB00C5FB76 /* AppDelegate.swift in Sources */,
 				0EAF0CDD252895DA00F552E6 /* UIColor+tint.swift in Sources */,
@@ -291,6 +314,7 @@
 				0EAF0D092528C18700F552E6 /* Stroke.swift in Sources */,
 				0EAF0D042528C18700F552E6 /* ButtonModifier.swift in Sources */,
 				0EAF0CF22528C16600F552E6 /* BorderedButton.swift in Sources */,
+				0EC771B3252A0BA200F24032 /* Global.swift in Sources */,
 				0EAF0D0A2528C18700F552E6 /* CardModifier.swift in Sources */,
 				0EAF0D072528C18700F552E6 /* Blur.swift in Sources */,
 				0E3BB03E25297D22004DE5AD /* ComponentEditorViewController.swift in Sources */,
@@ -446,13 +470,14 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = WXEditor/WXEditor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1000;
 				DEVELOPMENT_TEAM = C5UH93T368;
 				INFOPLIST_FILE = WXEditor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "-.WXEditor";
+				PRODUCT_BUNDLE_IDENTIFIER = liang2kl.dev.editor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
@@ -467,13 +492,14 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = WXEditor/WXEditor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1000;
 				DEVELOPMENT_TEAM = C5UH93T368;
 				INFOPLIST_FILE = WXEditor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "-.WXEditor";
+				PRODUCT_BUNDLE_IDENTIFIER = liang2kl.dev.editor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;

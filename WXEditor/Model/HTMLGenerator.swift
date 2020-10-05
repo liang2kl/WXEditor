@@ -8,7 +8,7 @@
 import Foundation
 
 class HTMLGenerator {
-    var rootComponent: RootComponent
+    var rootComponent: Component
     func generateHTML() -> String {
         let string = """
             <html>
@@ -34,12 +34,7 @@ class HTMLGenerator {
         return string
     }
     
-    init() {
-        let rootComponent = RootComponent(childs: [])
-        let component1 = P(string: "String", parent: rootComponent)
-        rootComponent.childs.append(component1)
-        let child = P(string: "String", parent: component1)
-        component1.childs.append(child)
+    init(rootComponent: Component) {
         self.rootComponent = rootComponent
     }
 }

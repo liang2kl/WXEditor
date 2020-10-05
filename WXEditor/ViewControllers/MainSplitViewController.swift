@@ -8,15 +8,15 @@
 import SwiftUI
 
 class MainSplitViewController: UISplitViewController {
-    let blankViewController = UIHostingController<BlankView>(rootView: BlankView())
+    static let blankViewController = UIHostingController<BlankView>(rootView: BlankView())
     override func viewDidLoad() {
         super.viewDidLoad()
         preferredDisplayMode = .twoBesideSecondary
         preferredSplitBehavior = .tile
-        let generator = HTMLGenerator()
-        setViewController(EditorViewController(generator: generator), for: .primary)
+        let generator = HTMLGenerator(rootComponent: Component(type: .root, parent: nil))
+        setViewController(FileViewController.defaultController, for: .primary)
         setViewController(HTMLPreviewViewController(generator: generator), for: .secondary)
-        setViewController(blankViewController, for: .supplementary)
+        setViewController(MainSplitViewController.blankViewController, for: .supplementary)
     }
     
     init() {
@@ -26,4 +26,5 @@ class MainSplitViewController: UISplitViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
 }

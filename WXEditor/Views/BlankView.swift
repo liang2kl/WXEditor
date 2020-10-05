@@ -14,7 +14,7 @@ struct BlankView: View {
                 .font(.system(size: 25, weight: .bold, design: .rounded))
                 .foregroundColor(Color(UIColor.tint))
                 .padding()
-            Text(NSLocalizedString("Select a Component", comment: ""))
+            Text(NSLocalizedString("Select an Element", comment: ""))
                 .font(.system(.headline, design: .rounded))
         }
     }
