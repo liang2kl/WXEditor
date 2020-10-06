@@ -43,7 +43,8 @@ struct ComponentEditorView: View {
             }
             if componentState.type != .br &&
                 componentState.type != .hr {
-                TableSection(title: componentState.type == .img ? NSLocalizedString("URL", comment: "") : NSLocalizedString("Content", comment: "")) {
+                let title = (componentState.type == .img || componentState.type == .a) ? NSLocalizedString("URL", comment: "") : NSLocalizedString("Content", comment: "");
+                TableSection(title: title) {
                     MyTextEditorView(vc: viewController!)
 //                    TextEditor(text: $componentState.string)
                         .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))

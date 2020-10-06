@@ -9,13 +9,31 @@ import SwiftUI
 
 struct BlankView: View {
     var body: some View {
-        HStack {
-            Image(systemName: "chevron.left.slash.chevron.right")
-                .font(.system(size: 25, weight: .bold, design: .rounded))
-                .foregroundColor(Color(UIColor.tint))
-                .padding()
+        HStack(spacing: 0) {
+            Group {
+                Text("<")
+                    .font(.custom("Menlo", size: 15, relativeTo: .body))
+                    .foregroundColor(.gray)
+                Text("Editor")
+                    .font(.custom("Menlo", size: 15, relativeTo: .body))
+                Text(">")
+                    .font(.custom("Menlo", size: 15, relativeTo: .body))
+                    .foregroundColor(.gray)
+            }
             Text(NSLocalizedString("Select an Element", comment: ""))
-                .font(.system(.headline, design: .rounded))
+                .font(.custom("Menlo", size: 15, relativeTo: .body))
+                .bold()
+            Group {
+                Text("</")
+                    .font(.custom("Menlo", size: 15, relativeTo: .body))
+                    .foregroundColor(.gray)
+                Text("Editor")
+                    .font(.custom("Menlo", size: 15, relativeTo: .body))
+                Text(">")
+                    .font(.custom("Menlo", size: 15, relativeTo: .body))
+                    .foregroundColor(.gray)
+            }
+
         }
     }
 }

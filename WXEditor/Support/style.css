@@ -13,6 +13,17 @@ h1 {
     margin-bottom: 1em;
 }
 
+div, span {
+    color: #333333;
+    line-height: 2.1;
+    letter-spacing: 0px;
+}
+
+figcaption {
+    line-height: 2.1;
+    letter-spacing: 0px;
+}
+
 h2 {
     letter-spacing: 0.1em;
     break-inside: avoid;
@@ -33,15 +44,13 @@ p {
     margin-bottom: 0.2em;
 }
 
-span {
-    color: #333333;
-    display: block;
-    line-height: 2.1;
-    letter-spacing: 0px;
+
+div.hasMargin {
+    margin-bottom: 0.5em;
 }
 
-span.hasMargin {
-    margin-bottom: 0.5em;
+div.normalHeight {
+    line-height: 1;
 }
 
 blockquote {
@@ -70,11 +79,11 @@ strong {
 }
 
 .h2Number {
+    letter-spacing: 0.1em;
     font-size: 24px;
     font-weight: bolder;
     color:rgb(17, 148, 127);
     display: inline-block;
-    /* border-right: 1px solid lightgray; */
     padding-left: 3px;
     padding-right: 5px;
     padding-bottom: 0px;
@@ -83,6 +92,7 @@ strong {
 }
 
 .h2Text {
+    letter-spacing: 0.1em;
     font-size: 18px;
     font-weight: bold;
     display: inline-block;
@@ -107,7 +117,7 @@ img {
     border: 5px solid rgb(17, 148, 127);
 }
 
-footer {
+figcaption {
     font-size: 14px;
     color: gray;
     margin-top: 0px;
@@ -125,7 +135,7 @@ ol, ul {
     display: inline;
 }
 
-span.quote {
+.quote {
     padding: 20px;
     text-align: center;
     font-style: italic;
@@ -134,7 +144,7 @@ span.quote {
     margin: 0.5em;
 }
 
-span.credits {
+.credits {
     color: gray;
     font-size: 14px;
     font-weight: lighter;

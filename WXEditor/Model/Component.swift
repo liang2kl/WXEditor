@@ -10,11 +10,10 @@ import Foundation
 enum HTMLComponent: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
     
-    case p, span, section, h1, h2, blockquote, img, footer, br, hr, root
+    case p, div, span, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, li, br, hr, figure, figcaption, img, a, code, pre, footer, root
     var head: String {
         switch self {
         case .p: return "p"
-        case .section: return "section"
         case .span: return "span"
         case .h1: return "h1"
         case .h2: return "h2"
@@ -24,12 +23,24 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .br: return "br"
         case .hr: return "hr"
         case .root: return "root"
+        case .div: return "div"
+        case .h3: return "h3"
+        case .h4: return "h4"
+        case .h5: return "h5"
+        case .h6: return "h6"
+        case .ol: return "ol"
+        case .ul: return "ul"
+        case .li: return "li"
+        case .figure: return "figure"
+        case .figcaption: return "figcaption"
+        case .a: return "a"
+        case .code: return "code"
+        case .pre: return "pre"
         }
     }
     var tail: String? {
         switch self {
         case .p: return "p"
-        case .section: return "section"
         case .span: return "span"
         case .h1: return "h1"
         case .h2: return "h2"
@@ -39,6 +50,19 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .br: return nil
         case .hr: return nil
         case .root: return nil
+        case .div: return "div"
+        case .h3: return "h3"
+        case .h4: return "h4"
+        case .h5: return "h5"
+        case .h6: return "h6"
+        case .ol: return "ol"
+        case .ul: return "ul"
+        case .li: return "li"
+        case .figure: return "figure"
+        case .figcaption: return "figcaption"
+        case .a: return "a"
+        case .code: return "code"
+        case .pre: return "pre"
         }
     }
     var imageName: String {
@@ -49,11 +73,24 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .br: return "arrow.turn.down.left"
         case .hr: return "minus"
         case .img: return "photo"
-        case .section: return "square.dashed"
         case .p: return "paragraphsign"
         case .span: return "text.justify"
         case .root: return ""
         case .footer: return "text.append"
+        case .div: return "text.append"
+        case .h3: return "3.square"
+        case .h4: return "4.square"
+        case .h5: return "5.square"
+        case .h6: return "6.square"
+        case .ol: return "list.number"
+        case .ul: return "list.bullet"
+        case .li: return "list.bullet.below.rectangle"
+        case .figure: return "squares.below.rectangle"
+        case .figcaption: return "ellipsis.rectangle"
+        case .a: return "link"
+        case .code: return "curlybraces"
+        case .pre: return "text.redaction"
+
         }
     }
 
@@ -82,6 +119,9 @@ class Component: NSObject, Codable {
         let className = self.className == "" ? "" : " class=\"\(self.className)\" "
         if self.htmlComponent == .img {
             return "<img\(className)src=\"\(string ?? "")\">"
+        }
+        if htmlComponent == .a {
+            return "<a\(className)href=\"\(string ?? "")\">"
         }
         var frontString = ""
         var backString = ""

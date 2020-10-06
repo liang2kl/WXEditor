@@ -211,7 +211,9 @@ extension EditorViewController {
     func deleteItem(_ id: UUID) {
         guard let component = getComponent(id: id, rootComponent: generator.rootComponent) else { return }
         component.parent!.remove(id: id)
+        saveDocument()
         applySnapshots()
+        updateHTML()
         splitViewController?.setViewController(MainSplitViewController.blankViewController, for: .supplementary)
     }
 }
