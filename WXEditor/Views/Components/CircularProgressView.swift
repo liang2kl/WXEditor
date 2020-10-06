@@ -43,7 +43,7 @@ struct CircularPathProgressView: View {
 
 struct CircularProgressView_Previews: PreviewProvider {
     static var previews: some View {
-        CircularProgressView(progress: .constant(0.7), desiredWidth: 100, color: Color("Tint"))
+        CircularProgressView(progress: .constant(0.7), desiredWidth: 100, color: .tint)
             .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
     }
 }

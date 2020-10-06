@@ -133,7 +133,7 @@ class FileViewController: UICollectionViewController {
             case .other:
                 content.image = UIImage(systemName: "doc.text")
             }
-            cell.tintColor = UIColor(named: "Tint")
+            cell.tintColor = .tint
             cell.contentConfiguration = content
         }
     }

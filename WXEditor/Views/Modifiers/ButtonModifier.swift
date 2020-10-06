@@ -11,7 +11,7 @@ import SwiftUI
 struct ButtonModifier: ViewModifier {
     @Binding var isFilled: Bool
     @Binding var isDisabled: Bool
-    var backgroundColor: Color = Color(UIColor(named: "Tint")!)
+    var backgroundColor: Color = Color.tint
     var foregroundColor = Color(UIColor.systemBackground)
     static let cornerRadius: CGFloat = 12
     func body(content: Content) -> some View {

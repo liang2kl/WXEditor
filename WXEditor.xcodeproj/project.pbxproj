@@ -24,14 +24,12 @@
 		0EAF0CF32528C16600F552E6 /* CircularButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CE92528C16600F552E6 /* CircularButton.swift */; };
 		0EAF0CF42528C16600F552E6 /* LabelButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CEA2528C16600F552E6 /* LabelButtonView.swift */; };
 		0EAF0D022528C18700F552E6 /* CellModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CF92528C18700F552E6 /* CellModifier.swift */; };
-		0EAF0D032528C18700F552E6 /* GradientMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CFA2528C18700F552E6 /* GradientMask.swift */; };
 		0EAF0D042528C18700F552E6 /* ButtonModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CFB2528C18700F552E6 /* ButtonModifier.swift */; };
 		0EAF0D052528C18700F552E6 /* Disabled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CFC2528C18700F552E6 /* Disabled.swift */; };
 		0EAF0D062528C18700F552E6 /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CFD2528C18700F552E6 /* Layout.swift */; };
 		0EAF0D072528C18700F552E6 /* Blur.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CFE2528C18700F552E6 /* Blur.swift */; };
 		0EAF0D082528C18700F552E6 /* TopBarViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CFF2528C18700F552E6 /* TopBarViewModifier.swift */; };
 		0EAF0D092528C18700F552E6 /* Stroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0D002528C18700F552E6 /* Stroke.swift */; };
-		0EAF0D0A2528C18700F552E6 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0D012528C18700F552E6 /* CardModifier.swift */; };
 		0EC771A82529C0E200F24032 /* BlankView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC771A72529C0E200F24032 /* BlankView.swift */; };
 		0EC771AD252A0B7800F24032 /* MyFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC771AC252A0B7800F24032 /* MyFileManager.swift */; };
 		0EC771B0252A0B7E00F24032 /* FileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC771AF252A0B7E00F24032 /* FileViewController.swift */; };
@@ -68,14 +66,12 @@
 		0EAF0CE92528C16600F552E6 /* CircularButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularButton.swift; sourceTree = "<group>"; };
 		0EAF0CEA2528C16600F552E6 /* LabelButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelButtonView.swift; sourceTree = "<group>"; };
 		0EAF0CF92528C18700F552E6 /* CellModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellModifier.swift; sourceTree = "<group>"; };
-		0EAF0CFA2528C18700F552E6 /* GradientMask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientMask.swift; sourceTree = "<group>"; };
 		0EAF0CFB2528C18700F552E6 /* ButtonModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ButtonModifier.swift; sourceTree = "<group>"; };
 		0EAF0CFC2528C18700F552E6 /* Disabled.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Disabled.swift; sourceTree = "<group>"; };
 		0EAF0CFD2528C18700F552E6 /* Layout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Layout.swift; sourceTree = "<group>"; };
 		0EAF0CFE2528C18700F552E6 /* Blur.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Blur.swift; sourceTree = "<group>"; };
 		0EAF0CFF2528C18700F552E6 /* TopBarViewModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopBarViewModifier.swift; sourceTree = "<group>"; };
 		0EAF0D002528C18700F552E6 /* Stroke.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stroke.swift; sourceTree = "<group>"; };
-		0EAF0D012528C18700F552E6 /* CardModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardModifier.swift; sourceTree = "<group>"; };
 		0EC771A72529C0E200F24032 /* BlankView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlankView.swift; sourceTree = "<group>"; };
 		0EC771AC252A0B7800F24032 /* MyFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyFileManager.swift; sourceTree = "<group>"; };
 		0EC771AF252A0B7E00F24032 /* FileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileViewController.swift; sourceTree = "<group>"; };
@@ -145,14 +141,12 @@
 			isa = PBXGroup;
 			children = (
 				0EAF0CF92528C18700F552E6 /* CellModifier.swift */,
-				0EAF0CFA2528C18700F552E6 /* GradientMask.swift */,
 				0EAF0CFB2528C18700F552E6 /* ButtonModifier.swift */,
 				0EAF0CFC2528C18700F552E6 /* Disabled.swift */,
 				0EAF0CFD2528C18700F552E6 /* Layout.swift */,
 				0EAF0CFE2528C18700F552E6 /* Blur.swift */,
 				0EAF0CFF2528C18700F552E6 /* TopBarViewModifier.swift */,
 				0EAF0D002528C18700F552E6 /* Stroke.swift */,
-				0EAF0D012528C18700F552E6 /* CardModifier.swift */,
 			);
 			path = Modifiers;
 			sourceTree = "<group>";
@@ -314,7 +308,6 @@
 				0EAF0D052528C18700F552E6 /* Disabled.swift in Sources */,
 				0E9238E42528C2B800571918 /* TableView.swift in Sources */,
 				0EC771B6252A0E3100F24032 /* FileGenerator.swift in Sources */,
-				0EAF0D032528C18700F552E6 /* GradientMask.swift in Sources */,
 				0EAF0D082528C18700F552E6 /* TopBarViewModifier.swift in Sources */,
 				0EAF0CF02528C16600F552E6 /* ListCell.swift in Sources */,
 				0EC771B0252A0B7E00F24032 /* FileViewController.swift in Sources */,
@@ -335,7 +328,6 @@
 				0EAF0D042528C18700F552E6 /* ButtonModifier.swift in Sources */,
 				0EAF0CF22528C16600F552E6 /* BorderedButton.swift in Sources */,
 				0EC771B3252A0BA200F24032 /* Global.swift in Sources */,
-				0EAF0D0A2528C18700F552E6 /* CardModifier.swift in Sources */,
 				0EAF0D072528C18700F552E6 /* Blur.swift in Sources */,
 				0E3BB03E25297D22004DE5AD /* ComponentEditorViewController.swift in Sources */,
 				0EAF0CEF2528C16600F552E6 /* CircularProgressView.swift in Sources */,
@@ -490,7 +482,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = WXEditor/WXEditor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1001;
+				CURRENT_PROJECT_VERSION = 1003;
 				DEVELOPMENT_TEAM = C5UH93T368;
 				INFOPLIST_FILE = WXEditor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -512,7 +504,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = WXEditor/WXEditor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1001;
+				CURRENT_PROJECT_VERSION = 1003;
 				DEVELOPMENT_TEAM = C5UH93T368;
 				INFOPLIST_FILE = WXEditor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

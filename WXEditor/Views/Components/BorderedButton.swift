@@ -22,7 +22,7 @@ struct BorderedButton<Content>: View where Content: View {
         .disabled(isDisabled)
     }
     
-    init(color: Color = Color("Tint"), action: @escaping () -> Void, isFilled: Binding<Bool> = . constant(true), isDisabled: Binding<Bool> = .constant(false), @ViewBuilder content: @escaping () -> Content) {
+    init(color: Color = .tint, action: @escaping () -> Void, isFilled: Binding<Bool> = . constant(true), isDisabled: Binding<Bool> = .constant(false), @ViewBuilder content: @escaping () -> Content) {
         self.color = color
         self.action = action
         self._isFilled = isFilled

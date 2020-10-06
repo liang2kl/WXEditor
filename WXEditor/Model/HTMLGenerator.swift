@@ -25,6 +25,25 @@ class HTMLGenerator {
         return string
     }
     
+    func exportHTML() -> String {
+        let style = try! String(contentsOf: Bundle.main.url(forResource: "style", withExtension: "css")!)
+        let string = """
+            <html>
+                <head>
+                    <meta charset='UTF-8'>
+                </head>
+                <style>
+                \(style)
+                </style>
+                <body>
+                    \(getComponents())
+                </body>
+            </html>
+            """
+        print(string)
+        return string
+    }
+    
     func getComponents() -> String {
         var string: String = ""
         for component in rootComponent.childs {

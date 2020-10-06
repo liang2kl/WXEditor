@@ -10,7 +10,7 @@ import SwiftUI
 
 struct CircularButton: View {
     var imageName: String
-    var imageColor: Color? = Color("Tint")
+    var imageColor: Color? = .tint
     var backgroundColor: Color = Color(UIColor.systemGray3)
     var shadowed = false
     var preferredWidth: CGFloat

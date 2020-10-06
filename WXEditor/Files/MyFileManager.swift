@@ -87,23 +87,28 @@ class MyFileManager {
         return desUrl
     }
     
-    func availableURL(forURL url: URL) throws -> URL {
+    func availableURL(forName name: String, withExtension extensionString: String) throws -> URL {
         var isNamed = true
-        var lastPathComponent = url.lastPathComponent
-        let exten = url.pathExtension
+        var lastPathComponent = name + (extensionString == "" ? "" : ".\(extensionString)")
         var desUrl = self.url.appendingPathComponent(lastPathComponent)
         while isNamed {
             do {
                 _ = try desUrl.checkResourceIsReachable()
                 let fileName = desUrl.deletingPathExtension().lastPathComponent
                 let newName = copyName(fileName)
-                lastPathComponent = newName + "." + exten
+                lastPathComponent = newName + "." + extensionString
                 desUrl = self.url.appendingPathComponent(lastPathComponent)
             } catch {
                 isNamed = false
             }
         }
         return desUrl
+    }
+    
+    func availableURL(forURL url: URL) throws -> URL {
+        let name = url.deletingPathExtension().lastPathComponent
+        let exten = url.pathExtension
+        return try! availableURL(forName: name, withExtension: exten)
     }
     
     private func copyName(_ name: String) -> String {

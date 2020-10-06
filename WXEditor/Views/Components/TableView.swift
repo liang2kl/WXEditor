@@ -48,10 +48,10 @@ fileprivate struct TableHeader: View {
                     if isEditing {
                         Text(NSLocalizedString("Done", comment: ""))
                             .bold()
-                            .accentColor(Color("Tint"))
+                            .accentColor(.tint)
                     } else {
                         Text(NSLocalizedString("Edit", comment: ""))
-                            .accentColor(Color("Tint"))
+                            .accentColor(.tint)
                     }
                 }
             }

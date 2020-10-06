@@ -41,6 +41,10 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         for index in 0..<childs.count {
             self.component.childs[index].parent = self.component
         }
+        
+        guard let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController else { return }
+        editorVc.saveDocument()
+        
         if refreshSideBar {
             updateSideBar()
         }
@@ -50,7 +54,6 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         guard !isTutorial else { return }
         guard let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController else { return }
         editorVc.applySnapshots()
-        editorVc.saveDocument()
     }
     
     
@@ -104,11 +107,12 @@ class ComponentState: ObservableObject {
     @Published var className: String {
         didSet { update(refreshSideBar: false) }
     }
-    @Published var string: String {
-        didSet { update(refreshSideBar: true) }
-    }
+    @Published var string: String
     @Published var type: HTMLComponent {
-        didSet { update(refreshSideBar: true) }
+        didSet {
+            update(refreshSideBar: true)
+            viewController?.updatePreview()
+        }
     }
     var viewController: ComponentEditorViewController?
     

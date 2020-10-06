@@ -30,23 +30,26 @@ struct ComponentEditorView: View {
                         .font(.title2)
                         .bold()
                         .padding(.leading)
-                    TextField("No Class", text: $componentState.className)
-                        .padding(3)
-                        .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
-                        .padding(.trailing)
-                        .labelsHidden()
-                        .keyboardType(.default)
+                    TextField("No Class", text: $componentState.className, onCommit: {
+                        viewController?.updatePreview()
+                    })
+                    .padding(3)
+                    .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
+                    .padding(.trailing)
+                    .labelsHidden()
+                    .keyboardType(.default)
                 }
                 .padding(.top)
             }
             if componentState.type != .br &&
                 componentState.type != .hr {
                 TableSection(title: componentState.type == .img ? NSLocalizedString("URL", comment: "") : NSLocalizedString("Content", comment: "")) {
-                    TextEditor(text: $componentState.string)
+                    MyTextEditorView(vc: viewController!)
+//                    TextEditor(text: $componentState.string)
                         .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
                         .padding(.horizontal)
                         .frame(minHeight: 40)
-                        .keyboardType(.default)
+//                        .keyboardType(.default)
                 }
             }
             Spacer()

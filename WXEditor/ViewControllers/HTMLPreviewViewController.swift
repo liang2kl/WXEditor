@@ -13,6 +13,8 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
     private var webView: WKWebView!
     var generator: HTMLGenerator
     
+    private var tempUrl: URL?
+    
     override func loadView() {
         let webConfiguration = WKWebViewConfiguration()
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
@@ -25,6 +27,7 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
         super.viewDidLoad()
         loadHTML()
         navigationItem.title = NSLocalizedString("Preview", comment: "")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "square.and.arrow.up"), style: .plain, target: self, action: #selector(shareHTML(_:)))
     }
     
     func reload() {
@@ -45,6 +48,23 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
         }
     }
     
+    @objc func shareHTML(_ sender: UIBarButtonItem) {
+        let fileManager = MyFileManager(url: FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!)
+        do {
+            let string = generator.exportHTML()
+            let url = try fileManager.availableURL(forName: "Exported_HTML", withExtension: "html")
+            try string.write(to: url, atomically: true, encoding: String.Encoding.utf8)
+            let objectsToShare = [url]
+            let activityVC = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
+            activityVC.modalPresentationStyle = .popover
+            activityVC.popoverPresentationController?.barButtonItem = sender
+            activityVC.popoverPresentationController?.delegate = self
+            tempUrl = url
+            present(activityVC, animated: true)
+        } catch {
+            print(error)
+        }
+    }
     
     init(generator: HTMLGenerator) {
         self.generator = generator
@@ -56,3 +76,11 @@ class HTMLPreviewViewController: UIViewController, WKUIDelegate, WKNavigationDel
     }
 }
 
+extension HTMLPreviewViewController: UIPopoverPresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        if let tempUrl = tempUrl {
+            try? FileManager.default.removeItem(at: tempUrl)
+            self.tempUrl = nil
+        }
+    }
+}
