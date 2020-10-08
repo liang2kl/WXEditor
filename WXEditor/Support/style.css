@@ -13,7 +13,7 @@ h1 {
     margin-bottom: 1em;
 }
 
-div, span {
+section, span {
     color: #333333;
     line-height: 2.1;
     letter-spacing: 0px;
@@ -45,11 +45,11 @@ p {
 }
 
 
-div.hasMargin {
+section.hasMargin {
     margin-bottom: 0.5em;
 }
 
-div.normalHeight {
+section.normalHeight {
     line-height: 1;
 }
 
@@ -111,8 +111,8 @@ img {
 .image {
     margin-top: 1em;
     margin-bottom: 0.2em;
-    min-width: 100%;
-    max-width: 100%;
+    min-width: calc(100% - 10px);
+    max-width: calc(100% - 10px);
     background-color: rgb(17, 148, 127);
     border: 5px solid rgb(17, 148, 127);
 }
@@ -126,8 +126,6 @@ figcaption {
 }
 
 ol, ul {
-    padding-left: 0;
-    margin-left: 0;
     color: rgb(17, 148, 127);
 }
 

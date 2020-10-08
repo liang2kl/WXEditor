@@ -10,7 +10,7 @@ import Foundation
 enum HTMLComponent: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
     
-    case p, div, span, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, li, br, hr, figure, figcaption, img, a, code, pre, footer, root
+    case p, section, span, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, li, br, hr, figure, figcaption, img, a, code, pre, footer, div, root
     var head: String {
         switch self {
         case .p: return "p"
@@ -23,7 +23,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .br: return "br"
         case .hr: return "hr"
         case .root: return "root"
-        case .div: return "div"
+        case .section: return "section"
         case .h3: return "h3"
         case .h4: return "h4"
         case .h5: return "h5"
@@ -36,6 +36,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .a: return "a"
         case .code: return "code"
         case .pre: return "pre"
+        case .div: return "div"
         }
     }
     var tail: String? {
@@ -50,7 +51,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .br: return nil
         case .hr: return nil
         case .root: return nil
-        case .div: return "div"
+        case .section: return "section"
         case .h3: return "h3"
         case .h4: return "h4"
         case .h5: return "h5"
@@ -63,6 +64,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .a: return "a"
         case .code: return "code"
         case .pre: return "pre"
+        case .div: return "div"
         }
     }
     var imageName: String {
@@ -76,8 +78,8 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .p: return "paragraphsign"
         case .span: return "text.justify"
         case .root: return ""
-        case .footer: return "text.append"
-        case .div: return "text.append"
+        case .footer: return "dock.rectangle"
+        case .section: return "text.append"
         case .h3: return "3.square"
         case .h4: return "4.square"
         case .h5: return "5.square"
@@ -90,7 +92,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .a: return "link"
         case .code: return "curlybraces"
         case .pre: return "text.redaction"
-
+        case .div: return "text.append"
         }
     }
 
@@ -164,6 +166,39 @@ class Component: NSObject, Codable {
     func insert(_ child: Component, at index: Int) {
         childs.insert(child, at: index)
     }
+    
+    func componentCopy(parent: Component) -> Component {
+        let newComponent = Component(type: self.htmlComponent, className: self.className, childs: [], string: self.string, parent: self.parent)
+        let childs = copiedChilds(ofParent: parent, newParent: newComponent)
+        newComponent.childs = childs
+        return newComponent
+    }
+    
+    private func copiedChilds(ofParent parent: Component, newParent: Component) -> [Component] {
+        var childs = [Component]()
+        for child in parent.childs {
+            let newChild = Component(type: child.htmlComponent, className: child.className, childs: [], string: child.string, parent: newParent)
+            newChild.childs = copiedChilds(ofParent: child, newParent: newChild)
+            childs.append(newChild)
+        }
+        return childs
+    }
+
+    static func getComponent(id: UUID, rootComponent: Component) -> Component? {
+        if let component = rootComponent.childs.first(where: {$0.id == id}) {
+            return component
+        } else {
+            for child in rootComponent.childs {
+                let component = getComponent(id: id, rootComponent: child)
+                if component != nil {
+                    return component
+                }
+            }
+        }
+        return nil
+    }
+    
+    //MARK: - Codable
 
     enum CodingKeys: CodingKey {
         case className, childs, parent, string, type, front

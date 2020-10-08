@@ -13,7 +13,7 @@ class HTMLGenerator {
         let string = """
             <html>
                 <head>
-                    <meta charset='UTF-8'>
+                    <meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1 user-scalable=no'>
                 </head>
                 <link rel="stylesheet" type="text/css" href="\(Bundle.main.url(forResource: "style", withExtension: "css")!.absoluteString)">
                 <body>
@@ -30,10 +30,10 @@ class HTMLGenerator {
         let string = """
             <html>
                 <head>
-                    <meta charset='UTF-8'>
+                    <meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
                 </head>
                 <style>
-                \(style)
+                    \(style)
                 </style>
                 <body>
                     \(getComponents())

@@ -46,14 +46,14 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         editorVc.saveDocument()
         
         if refreshSideBar {
-            updateSideBar()
+            updateSideBar(id: self.component.id)
         }
     }
     
-    func updateSideBar() {
+    func updateSideBar(id: UUID) {
         guard !isTutorial else { return }
         guard let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController else { return }
-        editorVc.applySnapshots()
+        editorVc.applySnapshots(updateForID: id)
     }
     
     
@@ -81,7 +81,7 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         let rootComponent = component
         newComponent = Component(type: type, parent: rootComponent)
         rootComponent.append(newComponent)
-        update(id: newComponent.id)
+        update(newComponent: newComponent)
         if let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController {
             let item = EditorViewController.Item(component: newComponent)
             let indexPath = editorVc.dataSource.indexPath(for: item)!
@@ -90,13 +90,13 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         }
     }
     
-    func update(id: UUID) {
+    func update(newComponent: Component) {
         guard !isTutorial else { return }
         guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
               let previewVc = navVc.topViewController as? HTMLPreviewViewController,
               let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController else { return }
         previewVc.reload()
-        editorVc.applySnapshots()
+        editorVc.applySnapshots(appendForComponent: newComponent)
         editorVc.saveDocument()
     }
 

@@ -129,7 +129,7 @@ class FileViewController: UICollectionViewController {
                 content.image = UIImage(systemName: "folder")
                 cell.accessories = [.disclosureIndicator()]
             case .doc:
-                content.image = UIImage(systemName: "doc.text.fill")
+                content.image = UIImage(systemName: "doc.richtext.fill")
             case .other:
                 content.image = UIImage(systemName: "doc.text")
             }

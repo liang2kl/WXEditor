@@ -1,5 +1,5 @@
 //
-//  MyTextEditor.swift
+//  MyTextEditorView.swift
 //  WXEditor
 //
 //  Created by 梁业升 on 2020/10/5.
@@ -14,10 +14,10 @@ final class MyTextEditorView: UIViewControllerRepresentable {
     }
     
     var viewController: ComponentEditorViewController
-    var vc: TextEditorViewController!
+    var vc: MyTextEditorViewController!
     
     func makeUIViewController(context: Context) -> some UIViewController {
-        let controller = TextEditorViewController(string: viewController.componentState.string)
+        let controller = MyTextEditorViewController(string: viewController.componentState.string)
         vc = controller
         vc.textView.delegate = context.coordinator
         return controller
@@ -37,7 +37,7 @@ final class MyTextEditorView: UIViewControllerRepresentable {
     }
     
     func updateAppearance() {
-        viewController.updateSideBar()
+        viewController.updateSideBar(id: viewController.component.id)
         viewController.updatePreview()
     }
 

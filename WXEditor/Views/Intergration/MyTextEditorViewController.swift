@@ -1,5 +1,5 @@
 //
-//  TextEditorViewController.swift
+//  MyTextEditorViewController.swift
 //  WXEditor
 //
 //  Created by 梁业升 on 2020/10/5.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TextEditorViewController: UIViewController {
+class MyTextEditorViewController: UIViewController {
     var textView: UITextView!
     init(string: String) {
         super.init(nibName: nil, bundle: nil)
