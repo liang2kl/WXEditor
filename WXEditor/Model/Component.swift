@@ -9,7 +9,9 @@ import Foundation
 
 enum HTMLComponent: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
-    
+    enum Classification: Int, CaseIterable {
+        case paragraph, header, list, otherUseful, other
+    }
     case p, section, span, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, li, br, hr, figure, figcaption, img, a, code, pre, footer, div, root
     var head: String {
         switch self {
@@ -95,6 +97,16 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .div: return "text.append"
         }
     }
+    
+    var classification: Classification {
+        switch self {
+        case .p, .section, .span, .blockquote: return .paragraph
+        case .h1, .h2, .h3, .h4, .h5, .h6: return .header
+        case .ol, .ul, .li: return .list
+        case .img, .figcaption, .br, .hr: return .otherUseful
+        default: return .other
+        }
+    }
 
 }
 
@@ -169,7 +181,7 @@ class Component: NSObject, Codable {
     
     func componentCopy(parent: Component) -> Component {
         let newComponent = Component(type: self.htmlComponent, className: self.className, childs: [], string: self.string, parent: self.parent)
-        let childs = copiedChilds(ofParent: parent, newParent: newComponent)
+        let childs = copiedChilds(ofParent: self, newParent: newComponent)
         newComponent.childs = childs
         return newComponent
     }

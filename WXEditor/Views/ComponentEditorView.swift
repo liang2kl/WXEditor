@@ -46,11 +46,9 @@ struct ComponentEditorView: View {
                 let title = (componentState.type == .img || componentState.type == .a) ? NSLocalizedString("URL", comment: "") : NSLocalizedString("Content", comment: "");
                 TableSection(title: title) {
                     MyTextEditorView(vc: viewController!)
-//                    TextEditor(text: $componentState.string)
                         .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
                         .padding(.horizontal)
                         .frame(minHeight: 40)
-//                        .keyboardType(.default)
                 }
             }
             Spacer()

@@ -17,8 +17,7 @@ class EditorViewController: UICollectionViewController {
         let file = FileHandle(forReadingAtPath: url.path)
         url.stopAccessingSecurityScopedResource()
         let data = file!.readDataToEndOfFile()
-        let rootComponent = (try! JSONDecoder().decode(Component.self, from: data))
-        
+        let rootComponent = try! JSONDecoder().decode(Component.self, from: data)
         self.generator = HTMLGenerator(rootComponent: rootComponent)
         self.url = url
         self.isTutorial = isTutorial
@@ -34,17 +33,14 @@ class EditorViewController: UICollectionViewController {
     }
     
     struct Item: Hashable {
-        var id: UUID
-        var type: HTMLComponent
-        var string: String?
-        var hasChild: Bool
-        var imageName: String
+        private var component: Component
+        var id: UUID { component.id }
+        var type: HTMLComponent { component.htmlComponent }
+        var string: String? { component.string }
+        var hasChild: Bool { component.childs.count != 0 }
+        var imageName: String { type.imageName }
         init(component: Component) {
-            id = component.id
-            type = component.htmlComponent
-            string = component.string
-            hasChild = component.childs.count != 0
-            imageName = type.imageName
+            self.component = component
         }
     }
     
@@ -76,13 +72,19 @@ extension EditorViewController {
     }
     
     private func getAddButton() -> UIBarButtonItem {
-        var children: [UIAction] = []
-        for component in HTMLComponent.allCases where component != .root {
-            children.append(UIAction(title: component.head, image: UIImage(systemName: component.imageName)) { _ in
-                self.addComponent(type: component)
-            })
+        var menus = [UIMenu]()
+        for classification in HTMLComponent.Classification.allCases {
+            var classChildren: [UIAction] = []
+            for component in HTMLComponent.allCases where component != .root {
+                if component.classification == classification {
+                    classChildren.append(UIAction(title: component.head, image: UIImage(systemName: component.imageName)) { _ in
+                        self.addComponent(type: component)
+                    })
+                }
+            }
+            menus.append(UIMenu(options: .displayInline, children: classChildren))
         }
-        let button = UIBarButtonItem(title: nil, image: UIImage(systemName: "plus"), primaryAction: nil, menu: UIMenu(children: children))
+        let button = UIBarButtonItem(title: nil, image: UIImage(systemName: "plus"), primaryAction: nil, menu: UIMenu(children: menus))
         return button
     }
     
@@ -210,9 +212,18 @@ extension EditorViewController {
             snapShot.append([newItem])
         }
         snapShot.expand([newItem])
-        snapShot = getChilds(item: newItem, component: component, snapShot: snapShot)
+        snapShot = snapShotWithChilds(ofItem: newItem, ofComponent: component, snapShot: snapShot)
         dataSource.apply(snapShot, to: .main)
+        updateParent(parentID: parentID)
     }
+    
+    func updateParent(parentID: UUID) {
+        var snapShot = dataSource.snapshot()
+        guard let parentItem = snapShot.itemIdentifiers.first(where: {$0.id == parentID}) else { return }
+        snapShot.reloadItems([parentItem])
+        dataSource.apply(snapShot)
+    }
+
     
     func updateHTML() {
         guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
@@ -230,18 +241,18 @@ extension EditorViewController {
             let rootItem = Item(component: component)
             snapShot.append([rootItem])
             snapShot.expand([rootItem])
-            snapShot = getChilds(item: rootItem, component: component, snapShot: snapShot)
+            snapShot = snapShotWithChilds(ofItem: rootItem, ofComponent: component, snapShot: snapShot)
         }
         return snapShot
     }
     
-    private func getChilds(item: Item, component: Component, snapShot: NSDiffableDataSourceSectionSnapshot<Item>) ->  NSDiffableDataSourceSectionSnapshot<Item> {
+    private func snapShotWithChilds(ofItem: Item, ofComponent: Component, snapShot: NSDiffableDataSourceSectionSnapshot<Item>) -> NSDiffableDataSourceSectionSnapshot<Item> {
         var snapShot = snapShot
-        for child in component.childs {
+        for child in ofComponent.childs {
             let childItem = Item(component: child)
-            snapShot.append([childItem], to: item)
+            snapShot.append([childItem], to: ofItem)
             snapShot.expand([childItem])
-            snapShot = getChilds(item: childItem, component: child, snapShot: snapShot)
+            snapShot = snapShotWithChilds(ofItem: childItem, ofComponent: child, snapShot: snapShot)
         }
         return snapShot
     }
@@ -287,7 +298,10 @@ extension EditorViewController {
             actionProvider: { _ in
                 let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: "context menu"),image: UIImage(systemName: "trash"), attributes: [.destructive], state: .off) { _ in self.deleteItem(item.id) }
                 let duplicateAction = UIAction(title: NSLocalizedString("Duplicate", comment: "context menu"),image: UIImage(systemName: "plus.square.on.square"), attributes: [.init()], state: .off) { _ in self.duplicateItem(id: item.id) }
-                let children: [UIMenuElement] = [deleteAction, duplicateAction]
+                let children: [UIMenuElement] = [
+                    duplicateAction,
+                    UIMenu(options: .displayInline, children: [deleteAction])
+                ]
                 return UIMenu(title: "", children: children)
             })
     }
@@ -314,6 +328,7 @@ extension EditorViewController {
         guard let component = Component.getComponent(id: id, rootComponent: generator.rootComponent) else { return }
         applySnapshots(removeForID: id)
         component.parent!.remove(id: id)
+        updateParent(parentID: component.parent!.id)
         saveDocument()
         updateHTML()
     }
@@ -329,12 +344,11 @@ extension EditorViewController {
     
     
     func saveDocument() {
-        if !isTutorial {
-            DispatchQueue.global(qos: .background).async {
-                guard let data = FileGenerator.generate(fromRoot: self.generator.rootComponent) else { return }
-                try? FileManager.default.removeItem(at: self.url)
-                FileManager.default.createFile(atPath: self.url.path, contents: data, attributes: nil)
-            }
+        guard !isTutorial else { return }
+        DispatchQueue.global(qos: .background).async {
+            guard let data = FileGenerator.generate(fromRoot: self.generator.rootComponent) else { return }
+            try? FileManager.default.removeItem(at: self.url)
+            FileManager.default.createFile(atPath: self.url.path, contents: data, attributes: nil)
         }
     }
 

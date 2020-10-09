@@ -65,16 +65,22 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     }
     
     private func getAddButton() -> UIBarButtonItem {
-        var children: [UIAction] = []
-        for component in HTMLComponent.allCases where component != .root {
-            children.append(UIAction(title: component.head, image: UIImage(systemName: component.imageName)) { _ in
-                self.addComponent(type: component)
-            })
+        var menus = [UIMenu]()
+        for classification in HTMLComponent.Classification.allCases {
+            var classChildren: [UIAction] = []
+            for component in HTMLComponent.allCases where component != .root {
+                if component.classification == classification {
+                    classChildren.append(UIAction(title: component.head, image: UIImage(systemName: component.imageName)) { _ in
+                        self.addComponent(type: component)
+                    })
+                }
+            }
+            menus.append(UIMenu(options: .displayInline, children: classChildren))
         }
-        let button = UIBarButtonItem(title: nil, image: UIImage(systemName: "plus"), primaryAction: nil, menu: UIMenu(children: children))
+        let button = UIBarButtonItem(title: nil, image: UIImage(systemName: "plus"), primaryAction: nil, menu: UIMenu(children: menus))
         return button
     }
-    
+
     func addComponent(type: HTMLComponent) {
         guard !isTutorial else { return }
         var newComponent: Component
@@ -83,7 +89,7 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         rootComponent.append(newComponent)
         update(newComponent: newComponent)
         if let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController {
-            let item = EditorViewController.Item(component: newComponent)
+            let item = editorVc.dataSource.snapshot().itemIdentifiers.first(where: {$0.id == newComponent.id})!
             let indexPath = editorVc.dataSource.indexPath(for: item)!
             editorVc.collectionView(editorVc.collectionView, didSelectItemAt: indexPath)
             editorVc.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)

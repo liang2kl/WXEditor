@@ -354,7 +354,11 @@ extension FileViewController {
                 let renameAction = UIAction(title: NSLocalizedString("Rename", comment: "context menu"), image: UIImage(systemName: "pencil.and.ellipsis.rectangle"), state: .off) { _ in self.rename(indexPath: indexPath) }
                 let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: "context menu"),image: UIImage(systemName: "trash"), attributes: [.destructive], state: .off) { _ in self.delete(items: [item]) }
                 let shareMenuAction = UIAction(title: NSLocalizedString("Share", comment: "context menu"),image: UIImage(systemName: "square.and.arrow.up"), attributes: [], state: .off) { _ in self.share(indexPath: indexPath) }
-                let children: [UIMenuElement] = [renameAction, shareMenuAction, deleteAction]
+                let children: [UIMenuElement] = [
+                    renameAction,
+                    shareMenuAction,
+                    UIMenu(options: .displayInline, children: [deleteAction])
+                ]
                 let title = item.url.lastPathComponent
                 return UIMenu(title: title, children: children)
         })
