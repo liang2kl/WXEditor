@@ -179,18 +179,18 @@ class Component: NSObject, Codable {
         childs.insert(child, at: index)
     }
     
-    func componentCopy(parent: Component) -> Component {
-        let newComponent = Component(type: self.htmlComponent, className: self.className, childs: [], string: self.string, parent: self.parent)
-        let childs = copiedChilds(ofParent: self, newParent: newComponent)
+    func copy(toParent parent: Component) -> Component {
+        let newComponent = Component(type: self.htmlComponent, className: self.className, childs: [], string: self.string, parent: parent)
+        let childs = copiedChilds(fromParent: self, toParent: newComponent)
         newComponent.childs = childs
         return newComponent
     }
     
-    private func copiedChilds(ofParent parent: Component, newParent: Component) -> [Component] {
+    private func copiedChilds(fromParent parent: Component, toParent newParent: Component) -> [Component] {
         var childs = [Component]()
         for child in parent.childs {
             let newChild = Component(type: child.htmlComponent, className: child.className, childs: [], string: child.string, parent: newParent)
-            newChild.childs = copiedChilds(ofParent: child, newParent: newChild)
+            newChild.childs = copiedChilds(fromParent: child, toParent: newChild)
             childs.append(newChild)
         }
         return childs

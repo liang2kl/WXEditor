@@ -254,11 +254,11 @@ extension EditorViewController {
         return snapShot
     }
     
-    private func snapShotWithChilds(ofItem: Item, ofComponent: Component, snapShot: NSDiffableDataSourceSectionSnapshot<Item>) -> NSDiffableDataSourceSectionSnapshot<Item> {
+    private func snapShotWithChilds(ofItem item: Item, ofComponent component: Component, snapShot: NSDiffableDataSourceSectionSnapshot<Item>) -> NSDiffableDataSourceSectionSnapshot<Item> {
         var snapShot = snapShot
-        for child in ofComponent.childs {
+        for child in component.childs {
             let childItem = Item(component: child)
-            snapShot.append([childItem], to: ofItem)
+            snapShot.append([childItem], to: item)
             snapShot.expand([childItem])
             snapShot = snapShotWithChilds(ofItem: childItem, ofComponent: child, snapShot: snapShot)
         }
@@ -298,7 +298,7 @@ extension EditorViewController {
     
     // MARK: -
     override func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        guard !isTutorial else { return nil }
+        guard !isTutorial && !collectionView.isEditing else { return nil }
         guard let item = dataSource.itemIdentifier(for: indexPath) else { fatalError() }
         return UIContextMenuConfiguration(
             identifier: indexPath as NSIndexPath,
@@ -343,7 +343,7 @@ extension EditorViewController {
     
     func duplicateItem(id: UUID) {
         guard let component = Component.getComponent(id: id, rootComponent: generator.rootComponent) else { return }
-        let newComponent = component.componentCopy(parent: component.parent!)
+        let newComponent = component.copy(toParent: component.parent!)
         component.parent!.append(newComponent)
         saveDocument()
         applySnapshots(appendForComponent: newComponent)
@@ -361,29 +361,42 @@ extension EditorViewController {
     }
     
     func reorder(with difference: CollectionDifference<Item>) {
-        let snapShot = dataSource.snapshot()
-        let sectionSnapShot = dataSource.snapshot(for: .main)
+        var snapShot = dataSource.snapshot()
+        var sectionSnapShot = dataSource.snapshot(for: .main)
         for diff in difference {
             switch diff {
             case .insert(_, let item, _):
-                print("append_remove_")
                 let component = Component.getComponent(id: item.id, rootComponent: generator.rootComponent)!
-                let parentComponent = component.parent!
+                let indexPath = dataSource.indexPath(for: item)!
+                if indexPath.row != 0 {
+                    let row = indexPath.row
+                    let section = indexPath.section
+                    let previousIndexPath = IndexPath(row: row - 1, section: section)
+                    let nextIndexPath = IndexPath(row: row + 1, section: section)
+                    if let previousItem = dataSource.itemIdentifier(for: previousIndexPath),
+                       let nextItem = dataSource.itemIdentifier(for: nextIndexPath) {
+                        let newParentComponent = Component.getComponent(id: previousItem.id, rootComponent: generator.rootComponent)!
+                        if sectionSnapShot.level(of: nextItem) == sectionSnapShot.level(of: previousItem) + 1 {
+                            moveChild(component, to: newParentComponent, at: 0)
+                            self.saveDocument()
+                            sectionSnapShot.delete([item])
+                            DispatchQueue.main.async {
+                                self.dataSource.apply(sectionSnapShot, to: .main)
+                                self.reloadSnapShots(ofParentItem: previousItem)
+                            }
+                            return
+                        }
+                    }
+                }
+
                 if let parentItem = sectionSnapShot.parent(of: item) {
                     let newParentComponent = Component.getComponent(id: parentItem.id, rootComponent: generator.rootComponent)!
-                    let newComponent = component.componentCopy(parent: newParentComponent)
                     let parentSnapShot = sectionSnapShot.snapshot(of: parentItem)
                     let index = parentSnapShot.items.firstIndex(of: item)!
-                    print("indexx", index)
-                    parentComponent.remove(id: item.id)
-                    newParentComponent.childs.insert(newComponent, at: index)
+                    moveChild(component, to: newParentComponent, at: index)
                 } else {
-                    let newComponent = component.componentCopy(parent: generator.rootComponent)
                     let index = snapShot.indexOfItem(item)!
-                    print("indexx", index)
-                    parentComponent.remove(id: item.id)
-                    generator.rootComponent.childs.insert(newComponent, at: index)
-                    print(generator.rootComponent.childs[index].htmlComponent)
+                    moveChild(component, to: generator.rootComponent, at: index)
                 }
                 DispatchQueue.main.async {
                     self.saveDocument()
@@ -395,4 +408,25 @@ extension EditorViewController {
         }
     }
 
+    private func moveChild(_ child: Component, to parent: Component, at index: Int) {
+        let newComponent = child.copy(toParent: parent)
+        child.parent!.remove(id: child.id)
+        parent.insert(newComponent, at: index)
+    }
+    
+    func reloadSnapShots(ofParentItem parentItem: Item) {
+        var snapShots = NSDiffableDataSourceSectionSnapshot<Item>()
+        let component = Component.getComponent(id: parentItem.id, rootComponent: generator.rootComponent)!
+        for child in component.childs {
+            let item = Item(component: child)
+            snapShots.append([item])
+            snapShots.expand([item])
+            snapShots = snapShotWithChilds(ofItem: item, ofComponent: child, snapShot: snapShots)
+        }
+        var sectionSnapShot = dataSource.snapshot(for: .main)
+        sectionSnapShot.replace(childrenOf: parentItem, using: snapShots)
+        DispatchQueue.main.async {
+            self.dataSource.apply(sectionSnapShot, to: .main)
+        }
+    }
 }
