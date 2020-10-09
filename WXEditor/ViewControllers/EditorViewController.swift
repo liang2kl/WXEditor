@@ -131,7 +131,7 @@ extension EditorViewController {
             ]
             if !self.isTutorial {
                 cell.accessories += [
-//                    .reorder(),
+                    .reorder(),
                     .delete()
                 ]
             }
@@ -152,6 +152,8 @@ extension EditorViewController {
         dataSource.reorderingHandlers.canReorderItem = { item in return true }
 
         dataSource.reorderingHandlers.didReorder = { transaction in
+            let difference = transaction.difference
+            self.reorder(with: difference)
         }
     }
     
@@ -168,6 +170,19 @@ extension EditorViewController {
         }
     }
     
+
+    
+    func updateHTML() {
+        guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
+              let previewVc = navVc.topViewController as? HTMLPreviewViewController else { return }
+        previewVc.reload()
+    }
+
+}
+
+//MARK: - Update Snapshots
+
+extension EditorViewController {
     func applySnapshots(updateForID id: UUID) {
         let indexPath = collectionView.indexPathsForSelectedItems?.first
         var snapShot = dataSource.snapshot()
@@ -222,13 +237,6 @@ extension EditorViewController {
         guard let parentItem = snapShot.itemIdentifiers.first(where: {$0.id == parentID}) else { return }
         snapShot.reloadItems([parentItem])
         dataSource.apply(snapShot)
-    }
-
-    
-    func updateHTML() {
-        guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
-              let previewVc = navVc.topViewController as? HTMLPreviewViewController else { return }
-        previewVc.reload()
     }
 
 }
@@ -349,6 +357,41 @@ extension EditorViewController {
             guard let data = FileGenerator.generate(fromRoot: self.generator.rootComponent) else { return }
             try? FileManager.default.removeItem(at: self.url)
             FileManager.default.createFile(atPath: self.url.path, contents: data, attributes: nil)
+        }
+    }
+    
+    func reorder(with difference: CollectionDifference<Item>) {
+        let snapShot = dataSource.snapshot()
+        let sectionSnapShot = dataSource.snapshot(for: .main)
+        for diff in difference {
+            switch diff {
+            case .insert(_, let item, _):
+                print("append_remove_")
+                let component = Component.getComponent(id: item.id, rootComponent: generator.rootComponent)!
+                let parentComponent = component.parent!
+                if let parentItem = sectionSnapShot.parent(of: item) {
+                    let newParentComponent = Component.getComponent(id: parentItem.id, rootComponent: generator.rootComponent)!
+                    let newComponent = component.componentCopy(parent: newParentComponent)
+                    let parentSnapShot = sectionSnapShot.snapshot(of: parentItem)
+                    let index = parentSnapShot.items.firstIndex(of: item)!
+                    print("indexx", index)
+                    parentComponent.remove(id: item.id)
+                    newParentComponent.childs.insert(newComponent, at: index)
+                } else {
+                    let newComponent = component.componentCopy(parent: generator.rootComponent)
+                    let index = snapShot.indexOfItem(item)!
+                    print("indexx", index)
+                    parentComponent.remove(id: item.id)
+                    generator.rootComponent.childs.insert(newComponent, at: index)
+                    print(generator.rootComponent.childs[index].htmlComponent)
+                }
+                DispatchQueue.main.async {
+                    self.saveDocument()
+                    self.applySnapshots()
+                }
+            case .remove:
+                print("remove_append")
+            }
         }
     }
 
