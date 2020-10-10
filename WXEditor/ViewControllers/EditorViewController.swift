@@ -46,7 +46,7 @@ class EditorViewController: UICollectionViewController {
     
     var generator: HTMLGenerator
     var dataSource: UICollectionViewDiffableDataSource<DataSection, Item>!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureHierarchy()
@@ -55,7 +55,7 @@ class EditorViewController: UICollectionViewController {
         applySnapshots()
         configurePreview()
     }
-
+    
 }
 
 extension EditorViewController {
@@ -96,10 +96,10 @@ extension EditorViewController {
     func configurePreview() {
         let newVc = HTMLPreviewViewController(generator: generator)
         let navVc = UINavigationController(rootViewController: newVc)
-
+        
         splitViewController?.setViewController(navVc, for: .secondary)
     }
-
+    
     func createLayout() -> UICollectionViewLayout {
         let sectionProvider = { (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
             guard let _ = DataSection(rawValue: sectionIndex) else { return nil }
@@ -109,14 +109,14 @@ extension EditorViewController {
                 guard let item = self.dataSource.itemIdentifier(for: indexPath) else { return nil }
                 return self.trailingSwipeActionsConfigurationForProjectCellItem(item: item)
             }
-
+            
             let section: NSCollectionLayoutSection
             section = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: layoutEnvironment)
             return section
         }
         return UICollectionViewCompositionalLayout(sectionProvider: sectionProvider)
     }
-
+    
     
     
     func configuredOutlineCell() -> UICollectionView.CellRegistration<UICollectionViewListCell, Item> {
@@ -124,7 +124,7 @@ extension EditorViewController {
             var content = cell.defaultContentConfiguration()
             content.text = item.string
             content.image = UIImage(systemName: item.imageName)
-
+            
             cell.tintColor = .tint
             cell.accessories = [
                 .label(text: item.type.head),
@@ -150,10 +150,12 @@ extension EditorViewController {
             return collectionView.dequeueConfiguredReusableCell(using: self.configuredOutlineCell(), for: indexPath, item: item)
         }
         dataSource.reorderingHandlers.canReorderItem = { item in return true }
-
+        
         dataSource.reorderingHandlers.didReorder = { transaction in
             let difference = transaction.difference
-            self.reorder(with: difference)
+            DispatchQueue.main.async {
+                self.reorder(with: difference)
+            }
         }
     }
     
@@ -170,14 +172,14 @@ extension EditorViewController {
         }
     }
     
-
+    
     
     func updateHTML() {
         guard let navVc = splitViewController?.viewController(for: .secondary) as? UINavigationController,
               let previewVc = navVc.topViewController as? HTMLPreviewViewController else { return }
         previewVc.reload()
     }
-
+    
 }
 
 //MARK: - Update Snapshots
@@ -187,14 +189,15 @@ extension EditorViewController {
         let indexPath = collectionView.indexPathsForSelectedItems?.first
         var snapShot = dataSource.snapshot()
         let item = snapShot.itemIdentifiers.first(where: {$0.id == id})!
-//        let newComponent = Component.getComponent(id: id, rootComponent: generator.rootComponent)!
-//        let newItem = Item(component: newComponent)
-//        guard newItem != item else { return }
-//        updateParent(parentID: newComponent.parent!.id)
-//        snapShot.insertItems([newItem], beforeItem: item)
-//        snapShot.deleteItems([item])
-        snapShot.reloadItems([item])
-        dataSource.apply(snapShot, animatingDifferences: true)
+        let newComponent = Component.getComponent(id: id, rootComponent: generator.rootComponent)!
+        let newItem = Item(component: newComponent)
+        guard newItem != item else { return }
+        let parentItem = snapShot.itemIdentifiers.first(where: {$0.id == newComponent.parent!.id})!
+        reloadSnapShots(ofParentItem: parentItem)
+        //        snapShot.insertItems([newItem], beforeItem: item)
+        //        snapShot.deleteItems([item])
+        //        snapShot.reloadItems([])
+        //        dataSource.apply(snapShot, animatingDifferences: true)
         if let indexPath = indexPath {
             collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
         }
@@ -240,7 +243,7 @@ extension EditorViewController {
         snapShot.reloadItems([parentItem])
         dataSource.apply(snapShot)
     }
-
+    
 }
 
 
@@ -267,7 +270,7 @@ extension EditorViewController {
         return snapShot
     }
     
-
+    
 }
 
 extension EditorViewController {
@@ -291,8 +294,9 @@ extension EditorViewController {
     }
     
     
-    override func collectionView(_ collectionView: UICollectionView, canEditItemAt indexPath: IndexPath) -> Bool {
-        return true
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        splitViewController?.setViewController(MainSplitViewController.blankViewController, for: .supplementary)
     }
 }
 
@@ -387,18 +391,16 @@ extension EditorViewController {
                         if sectionSnapShot.level(of: nextItem) == sectionSnapShot.level(of: previousItem) + 1 {
                             Component.moveChild(component, to: newParentComponent, at: 0)
                             self.saveDocument()
-                            DispatchQueue.main.async {
-                                sectionSnapShot.delete([item])
-                                self.dataSource.apply(sectionSnapShot, to: .main)
-                                self.reloadSnapShots(ofParentItem: previousItem)
-                                self.updateParent(parentID: previousParentID)
-                                self.updateHTML()
-                            }
+                            sectionSnapShot.delete([item])
+                            self.dataSource.apply(sectionSnapShot, to: .main)
+                            self.reloadSnapShots(ofParentItem: previousItem)
+                            self.updateParent(parentID: previousParentID)
+                            self.updateHTML()
                             return
                         }
                     }
                 }
-
+                
                 if let parentItem = sectionSnapShot.parent(of: item) {
                     let newParentComponent = Component.getComponent(id: parentItem.id, rootComponent: generator.rootComponent)!
                     let index = indexOfChildItem(item, ofParentItem: parentItem)!
@@ -408,10 +410,8 @@ extension EditorViewController {
                     Component.moveChild(component, to: generator.rootComponent, at: index)
                 }
                 sectionSnapShot.expand([item])
-                DispatchQueue.main.async {
-                    self.dataSource.apply(sectionSnapShot, to: .main)
-                    self.updateParent(parentID: previousParentID)
-                }
+                self.dataSource.apply(sectionSnapShot, to: .main)
+                self.updateParent(parentID: previousParentID)
                 
                 saveDocument()
                 updateHTML()
@@ -419,7 +419,7 @@ extension EditorViewController {
             }
         }
     }
-
+    
     
     private func reloadSnapShots(ofParentItem parentItem: Item) {
         var snapShots = NSDiffableDataSourceSectionSnapshot<Item>()
@@ -432,9 +432,7 @@ extension EditorViewController {
         }
         var sectionSnapShot = dataSource.snapshot(for: .main)
         sectionSnapShot.replace(childrenOf: parentItem, using: snapShots)
-        DispatchQueue.main.async {
-            self.dataSource.apply(sectionSnapShot, to: .main)
-        }
+        self.dataSource.apply(sectionSnapShot, to: .main)
     }
     
     private func indexOfChildItem(_ childItem: Item, ofParentItem parentItem: Item) -> Int? {
