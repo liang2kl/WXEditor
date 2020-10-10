@@ -187,11 +187,13 @@ extension EditorViewController {
         let indexPath = collectionView.indexPathsForSelectedItems?.first
         var snapShot = dataSource.snapshot()
         let item = snapShot.itemIdentifiers.first(where: {$0.id == id})!
-        let newComponent = Component.getComponent(id: id, rootComponent: generator.rootComponent)!
-        let newItem = Item(component: newComponent)
-        guard newItem != item else { return }
-        snapShot.insertItems([newItem], afterItem: item)
-        snapShot.deleteItems([item])
+//        let newComponent = Component.getComponent(id: id, rootComponent: generator.rootComponent)!
+//        let newItem = Item(component: newComponent)
+//        guard newItem != item else { return }
+//        updateParent(parentID: newComponent.parent!.id)
+//        snapShot.insertItems([newItem], beforeItem: item)
+//        snapShot.deleteItems([item])
+        snapShot.reloadItems([item])
         dataSource.apply(snapShot, animatingDifferences: true)
         if let indexPath = indexPath {
             collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
@@ -360,14 +362,20 @@ extension EditorViewController {
         }
     }
     
+}
+
+//MARK: - Reorder
+
+extension EditorViewController {
     func reorder(with difference: CollectionDifference<Item>) {
-        var snapShot = dataSource.snapshot()
+        let snapShot = dataSource.snapshot()
         var sectionSnapShot = dataSource.snapshot(for: .main)
         for diff in difference {
             switch diff {
             case .insert(_, let item, _):
                 let component = Component.getComponent(id: item.id, rootComponent: generator.rootComponent)!
                 let indexPath = dataSource.indexPath(for: item)!
+                let previousParentID = component.parent!.id
                 if indexPath.row != 0 {
                     let row = indexPath.row
                     let section = indexPath.section
@@ -377,12 +385,14 @@ extension EditorViewController {
                        let nextItem = dataSource.itemIdentifier(for: nextIndexPath) {
                         let newParentComponent = Component.getComponent(id: previousItem.id, rootComponent: generator.rootComponent)!
                         if sectionSnapShot.level(of: nextItem) == sectionSnapShot.level(of: previousItem) + 1 {
-                            moveChild(component, to: newParentComponent, at: 0)
+                            Component.moveChild(component, to: newParentComponent, at: 0)
                             self.saveDocument()
-                            sectionSnapShot.delete([item])
                             DispatchQueue.main.async {
+                                sectionSnapShot.delete([item])
                                 self.dataSource.apply(sectionSnapShot, to: .main)
                                 self.reloadSnapShots(ofParentItem: previousItem)
+                                self.updateParent(parentID: previousParentID)
+                                self.updateHTML()
                             }
                             return
                         }
@@ -391,30 +401,27 @@ extension EditorViewController {
 
                 if let parentItem = sectionSnapShot.parent(of: item) {
                     let newParentComponent = Component.getComponent(id: parentItem.id, rootComponent: generator.rootComponent)!
-                    let parentSnapShot = sectionSnapShot.snapshot(of: parentItem)
-                    let index = parentSnapShot.items.firstIndex(of: item)!
-                    moveChild(component, to: newParentComponent, at: index)
+                    let index = indexOfChildItem(item, ofParentItem: parentItem)!
+                    Component.moveChild(component, to: newParentComponent, at: index)
                 } else {
                     let index = snapShot.indexOfItem(item)!
-                    moveChild(component, to: generator.rootComponent, at: index)
+                    Component.moveChild(component, to: generator.rootComponent, at: index)
                 }
+                sectionSnapShot.expand([item])
                 DispatchQueue.main.async {
-                    self.saveDocument()
-                    self.applySnapshots()
+                    self.dataSource.apply(sectionSnapShot, to: .main)
+                    self.updateParent(parentID: previousParentID)
                 }
-            case .remove:
-                print("remove_append")
+                
+                saveDocument()
+                updateHTML()
+            default: break
             }
         }
     }
 
-    private func moveChild(_ child: Component, to parent: Component, at index: Int) {
-        let newComponent = child.copy(toParent: parent)
-        child.parent!.remove(id: child.id)
-        parent.insert(newComponent, at: index)
-    }
     
-    func reloadSnapShots(ofParentItem parentItem: Item) {
+    private func reloadSnapShots(ofParentItem parentItem: Item) {
         var snapShots = NSDiffableDataSourceSectionSnapshot<Item>()
         let component = Component.getComponent(id: parentItem.id, rootComponent: generator.rootComponent)!
         for child in component.childs {
@@ -429,4 +436,20 @@ extension EditorViewController {
             self.dataSource.apply(sectionSnapShot, to: .main)
         }
     }
+    
+    private func indexOfChildItem(_ childItem: Item, ofParentItem parentItem: Item) -> Int? {
+        let sectionSnapShot = dataSource.snapshot(for: .main)
+        let parentSnapShot = dataSource.snapshot(for: .main).snapshot(of: parentItem)
+        let parentLevel = sectionSnapShot.level(of: parentItem)
+        var index: Int?
+        for item in parentSnapShot.items {
+            if item == childItem { break }
+            if sectionSnapShot.level(of: item) == parentLevel + 1 {
+                if index == nil { index = 0 }
+                index! += 1;
+            }
+        }
+        return index
+    }
+    
 }

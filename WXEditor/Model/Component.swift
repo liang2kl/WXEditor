@@ -210,6 +210,19 @@ class Component: NSObject, Codable {
         return nil
     }
     
+    static func moveChild(_ child: Component, to parent: Component, at index: Int) {
+        let originalParent = child.parent!
+        if originalParent == parent {
+            parent.remove(id: child.id)
+            parent.insert(child, at: index)
+        } else {
+            child.parent = parent
+            parent.insert(child, at: index)
+            originalParent.remove(id: child.id)
+        }
+    }
+
+    
     //MARK: - Codable
 
     enum CodingKeys: CodingKey {
