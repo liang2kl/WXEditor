@@ -195,16 +195,20 @@ extension EditorViewController {
 extension EditorViewController {
     func applySnapshots(updateForID id: UUID) {
         let indexPath = collectionView.indexPathsForSelectedItems?.first
-        let snapShot = dataSource.snapshot()
+        var snapShot = dataSource.snapshot()
         let item = snapShot.itemIdentifiers.first(where: {$0.id == id})!
         let newComponent = Component.getComponent(id: id, rootComponent: generator.rootComponent)!
         let newItem = Item(component: newComponent)
         guard newItem != item else { return }
         if let parentItem = snapShot.itemIdentifiers.first(where: {$0.id == newComponent.parent!.id}) {
             reloadSnapShots(ofParentItem: parentItem)
-            if let indexPath = indexPath {
-                collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
-            }
+        } else {
+            snapShot.insertItems([newItem], afterItem: item)
+            snapShot.deleteItems([item])
+            dataSource.apply(snapShot)
+        }
+        if let indexPath = indexPath {
+            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
         }
     }
     
@@ -227,14 +231,22 @@ extension EditorViewController {
         return snapShot
     }
     
-    func applySnapshots(appendForComponent component: Component) {
+    func applySnapshots(appendForComponent component: Component, after item: Item? = nil) {
         var snapShot = dataSource.snapshot(for: .main)
         let parentID = component.parent!.id
         let newItem = Item(component: component)
         if let rootItem = dataSource.snapshot().itemIdentifiers.first(where: {$0.id == parentID}) {
-            snapShot.append([newItem], to: rootItem)
+            if let item = item {
+                snapShot.insert([newItem], after: item)
+            } else {
+                snapShot.append([newItem], to: rootItem)
+            }
         } else {
-            snapShot.append([newItem])
+            if let item = item {
+                snapShot.insert([newItem], after: item)
+            } else {
+                snapShot.append([newItem])
+            }
         }
         snapShot.expand([newItem])
         snapShot = snapShotWithChilds(ofItem: newItem, ofComponent: component, snapShot: snapShot)
@@ -341,9 +353,18 @@ extension EditorViewController {
     func addComponent(type: HTMLComponent) {
         let rootComponent = generator.rootComponent
         let newComponent: Component = Component(type: type, parent: rootComponent)
-        rootComponent.append(newComponent)
+        var selectedItem: Item?
+        if let selectedIndexPath = collectionView.indexPathsForSelectedItems?.first,
+           let _selectedItem = dataSource.itemIdentifier(for: selectedIndexPath),
+           dataSource.snapshot(for: .main).level(of: _selectedItem) == 0 {
+            selectedItem = _selectedItem
+            let selectedIndex = indexOfChildItem(_selectedItem, ofParentItem: nil)!
+            rootComponent.insert(newComponent, at: selectedIndex + 1)
+        } else {
+            rootComponent.append(newComponent)
+        }
         saveDocument()
-        applySnapshots(appendForComponent: newComponent)
+        applySnapshots(appendForComponent: newComponent, after: selectedItem)
         updateHTML()
         let item = Item(component: newComponent)
         let indexPath = dataSource.indexPath(for: item)!
@@ -362,11 +383,14 @@ extension EditorViewController {
     
     func duplicateItem(id: UUID) {
         guard let component = Component.getComponent(id: id, rootComponent: generator.rootComponent) else { return }
+        let parent = component.parent!
         let newComponent = component.copy(toParent: component.parent!)
-        component.parent!.append(newComponent)
+        let index = parent.childs.firstIndex(where: {$0.id == id})!
+        parent.insert(newComponent, at: index + 1)
         saveDocument()
         updateItem(id: id)
-        applySnapshots(appendForComponent: newComponent)
+        let originalItem = dataSource.snapshot().itemIdentifiers.first(where: {$0.id == id})
+        applySnapshots(appendForComponent: newComponent, after: originalItem)
         updateHTML()
     }
     
