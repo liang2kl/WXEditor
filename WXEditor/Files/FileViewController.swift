@@ -43,21 +43,61 @@ class FileViewController: UICollectionViewController {
     }
 
     //MARK: -
-    enum Section: Int, Hashable, CaseIterable {
-        case folder, doc, other
+    enum Section: Int, Hashable, CaseIterable, CustomStringConvertible {
+        case doc, info
+        var description: String {
+            switch self {
+            case .doc: return NSLocalizedString("Documents", comment: "")
+            case .info: return NSLocalizedString("Info", comment: "")
+            }
+        }
+    }
+    
+    enum Info: Int, CustomStringConvertible, CaseIterable {
+        case settings, guide
+        var description: String {
+            switch self {
+            case .settings: return NSLocalizedString("Settings", comment: "")
+            case .guide: return NSLocalizedString("Tutorial", comment: "")
+            }
+        }
+        var imageName: String {
+            switch self {
+            case .settings: return "gearshape"
+            case .guide: return "info.circle"
+            }
+        }
     }
     struct Item: Hashable {
-        let url: URL
-        let type: Section
+        private(set) var url: URL? = nil
+        private(set) var info: Info? = nil
+        private(set) var type: Section
+        private(set) var isTitle: Bool = false
+        var destinationViewController: UIViewController? {
+            switch info {
+            case .settings: return UIViewController()
+            default: return nil
+            }
+        }
+        var title: String {
+            if isTitle { return type.description }
+            switch type {
+            case .doc: return url!.deletingPathExtension().lastPathComponent
+            case .info: return info!.description
+            }
+        }
         init(url: URL) {
             self.url = url
-            if url.hasDirectoryPath {
-                type = .folder
-            } else if url.pathExtension == "wedoc" {
-                type = .doc
-            } else {
-                type = .other
-            }
+            type = .doc
+        }
+        init(info: Info) {
+            type = .info
+            self.info = info
+        }
+        
+        init(titleSection: Section) {
+            self.type = titleSection
+            self.isTitle = true
         }
     }
 
@@ -74,11 +114,13 @@ class FileViewController: UICollectionViewController {
             guard let _ = Section(rawValue: sectionIndex) else { return nil }
             var configuration = UICollectionLayoutListConfiguration(appearance: .sidebar)
             configuration.trailingSwipeActionsConfigurationProvider = { indexPath in
-                guard let item = self.dataSource.itemIdentifier(for: indexPath) else { return nil }
+                guard let item = self.dataSource.itemIdentifier(for: indexPath),
+                      let _ = item.url else { return nil }
                 return self.trailingSwipeActionsConfigurationForProjectCellItem(item: item)
             }
             configuration.leadingSwipeActionsConfigurationProvider = { indexPath in
-                guard let item = self.dataSource.itemIdentifier(for: indexPath) else { return nil }
+                guard let item = self.dataSource.itemIdentifier(for: indexPath),
+                      let _ = item.url else { return nil }
                 return self.leadingSwipeActionsConfigurationForProjectCellItem(item: item)
             }
             let section: NSCollectionLayoutSection
@@ -89,7 +131,7 @@ class FileViewController: UICollectionViewController {
     }
     
     func configureNavItem() {
-        navigationItem.title = NSLocalizedString("Documents", comment: "")
+        navigationItem.title = "Whiz"
         navigationItem.backButtonTitle = ""
         navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -103,7 +145,6 @@ class FileViewController: UICollectionViewController {
         ]))
 
         navigationItem.rightBarButtonItems = [addFileButton]
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "info"), style: .plain, target: self, action: #selector(showTutorial))
         
         let items: [UIBarButtonItem] = [
             UIBarButtonItem(image: UIImage(systemName: "trash"), style: .plain, target: self, action: #selector(deleteSelectedItmes))
@@ -115,28 +156,41 @@ class FileViewController: UICollectionViewController {
     func configureDataSource() {
         dataSource = UICollectionViewDiffableDataSource<Section, Item>(collectionView: collectionView) {
             (collectionView, indexPath, item) -> UICollectionViewCell? in
-            return collectionView.dequeueConfiguredReusableCell(using: self.configuredCell(), for: indexPath, item: item)
+            if item.isTitle {
+                return collectionView.dequeueConfiguredReusableCell(using: self.configuredOutlineHeaderCell(), for: indexPath, item: item)
+            } else {
+                return collectionView.dequeueConfiguredReusableCell(using: self.configuredCell(), for: indexPath, item: item)
+            }
         }
     }
 
     func configuredCell() -> UICollectionView.CellRegistration<UICollectionViewListCell, Item> {
         return UICollectionView.CellRegistration<UICollectionViewListCell, Item> { (cell, indexPath, item) in
-            var content = UIListContentConfiguration.cell()
-            content.text = item.url.lastPathComponent
+            var content = UIListContentConfiguration.sidebarCell()
+            content.text = item.title
             content.textProperties.numberOfLines = 1
             switch item.type {
-            case .folder:
-                content.image = UIImage(systemName: "folder")
-                cell.accessories = [.disclosureIndicator()]
             case .doc:
                 content.image = UIImage(systemName: "doc.richtext.fill")
-            case .other:
-                content.image = UIImage(systemName: "doc.text")
+                cell.tintColor = .tint
+            case .info:
+                content.image = UIImage(systemName: item.info!.imageName)
+                cell.tintColor = .systemGray
             }
-            cell.tintColor = .tint
+            cell.indentationLevel = 0
             cell.contentConfiguration = content
         }
     }
+    
+    func configuredOutlineHeaderCell() -> UICollectionView.CellRegistration<UICollectionViewListCell, Item> {
+        return UICollectionView.CellRegistration<UICollectionViewListCell, Item> { (cell, indexPath, item) in
+            var content = UIListContentConfiguration.sidebarHeader()
+            content.text = item.title
+            cell.contentConfiguration = content
+            cell.accessories = [.outlineDisclosure(options: .init(style: .header))]
+        }
+    }
+
     
     func applySnapShots(animated: Bool = true) {
         for section in Section.allCases {
@@ -168,24 +222,19 @@ class FileViewController: UICollectionViewController {
     //MARK: -
     func getSnapShot(for section: Section) -> NSDiffableDataSourceSectionSnapshot<Item> {
         var snapShot = NSDiffableDataSourceSectionSnapshot<Item>()
-        var items = [Item]()
-        var urls = [URL]()
-        do {
-            switch section {
-            case .folder:
-                urls = []
-            case .doc:
-                urls = try fileManager.urls(forType: "wedoc")
-            case .other:
-                urls = []
+        let rootItem = Item(titleSection: section)
+        snapShot.append([rootItem])
+        snapShot.expand([rootItem])
+        switch section {
+        case .doc:
+            do {
+                let urls = try fileManager.urls(forType: "wedoc")
+                snapShot.append(urls.map({Item(url: $0)}), to: rootItem)
+            } catch {
+                showErrorAlert(vc: self, withError: error)
             }
-            for url in urls {
-                let item = Item(url: url)
-                items.append(item)
-            }
-            snapShot.append(items)
-        } catch {
-            showErrorAlert(vc: self, withError: error)
+        case .info:
+            snapShot.append(Info.allCases.map({Item(info: $0)}), to: rootItem)
         }
         return snapShot
     }
@@ -222,9 +271,20 @@ class FileViewController: UICollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard !collectionView.isEditing else { return }
-        guard let url = dataSource.itemIdentifier(for: indexPath)?.url else { return }
-        let editorVc = EditorViewController(url: url)
-        navigationController?.pushViewController(editorVc, animated: true)
+        if let url = dataSource.itemIdentifier(for: indexPath)?.url {
+            let editorVc = EditorViewController(url: url)
+            navigationController?.pushViewController(editorVc, animated: true)
+        } else {
+            if let item = dataSource.itemIdentifier(for: indexPath) {
+                switch item.info {
+                case .guide: showTutorial()
+                default:
+                    if let vc = item.destinationViewController {
+                        splitViewController?.setViewController(vc, for: .supplementary)
+                    }
+                }
+            }
+        }
     }
     
     
@@ -232,7 +292,7 @@ class FileViewController: UICollectionViewController {
     //MARK: -
     func delete(items: [Item]) {
         do {
-            try self.fileManager.delete(items.map({$0.url}))
+            try self.fileManager.delete(items.map({$0.url!}))
             self.applySnapShots()
         } catch {
             showErrorAlert(vc: self, withError: error)
@@ -242,7 +302,7 @@ class FileViewController: UICollectionViewController {
     
     func share(indexPath: IndexPath) {
         guard let item = dataSource.itemIdentifier(for: indexPath) else { fatalError() }
-        let objectsToShare = [item.url]
+        let objectsToShare = [item.url!]
         let activityVC = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
         activityVC.modalPresentationStyle = .popover
         if let rect = collectionView.layoutAttributesForItem(at: indexPath)?.frame {
@@ -264,7 +324,7 @@ class FileViewController: UICollectionViewController {
             do {
                 if let newName = self.newName {
                     if newName != "" {
-                        try self.fileManager.rename(url: item.url, newName: newName)
+                        try self.fileManager.rename(url: item.url!, newName: newName)
                         self.applySnapShots()
                     }
                 }
@@ -279,7 +339,7 @@ class FileViewController: UICollectionViewController {
         alert.addTextField {
             (textField) -> Void in
             textField.delegate = self
-            textField.text = item.url.deletingPathExtension().lastPathComponent
+            textField.text = item.url!.deletingPathExtension().lastPathComponent
             textField.placeholder = NSLocalizedString("Enter new name", comment: "placeholder")
             textField.clearButtonMode = .always
         }
@@ -347,6 +407,7 @@ extension FileViewController {
     // MARK: -
     override func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         guard let item = dataSource.itemIdentifier(for: indexPath) else { fatalError() }
+        guard let url = item.url else { return nil }
         return UIContextMenuConfiguration(
             identifier: indexPath as NSIndexPath,
             previewProvider: nil,
@@ -359,7 +420,7 @@ extension FileViewController {
                     shareMenuAction,
                     UIMenu(options: .displayInline, children: [deleteAction])
                 ]
-                let title = item.url.lastPathComponent
+                let title = url.lastPathComponent
                 return UIMenu(title: title, children: children)
         })
     }

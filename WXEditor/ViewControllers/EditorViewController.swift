@@ -109,6 +109,11 @@ extension EditorViewController {
                 guard let item = self.dataSource.itemIdentifier(for: indexPath) else { return nil }
                 return self.trailingSwipeActionsConfigurationForProjectCellItem(item: item)
             }
+            configuration.leadingSwipeActionsConfigurationProvider = { indexPath in
+                if self.isTutorial { return nil }
+                guard let item = self.dataSource.itemIdentifier(for: indexPath) else { return nil }
+                return self.leadingSwipeActionsConfigurationForProjectCellItem(item: item)
+            }
             
             let section: NSCollectionLayoutSection
             section = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: layoutEnvironment)
@@ -149,12 +154,15 @@ extension EditorViewController {
             (collectionView, indexPath, item) -> UICollectionViewCell? in
             return collectionView.dequeueConfiguredReusableCell(using: self.configuredOutlineCell(), for: indexPath, item: item)
         }
-        dataSource.reorderingHandlers.canReorderItem = { item in return true }
         
-        dataSource.reorderingHandlers.didReorder = { transaction in
-            let difference = transaction.difference
-            DispatchQueue.main.async {
-                self.reorder(with: difference)
+        if !isTutorial {
+            dataSource.reorderingHandlers.canReorderItem = { _ in true }
+            
+            dataSource.reorderingHandlers.didReorder = { transaction in
+                let difference = transaction.difference
+                DispatchQueue.main.async {
+                    self.reorder(with: difference)
+                }
             }
         }
     }
@@ -187,19 +195,16 @@ extension EditorViewController {
 extension EditorViewController {
     func applySnapshots(updateForID id: UUID) {
         let indexPath = collectionView.indexPathsForSelectedItems?.first
-        var snapShot = dataSource.snapshot()
+        let snapShot = dataSource.snapshot()
         let item = snapShot.itemIdentifiers.first(where: {$0.id == id})!
         let newComponent = Component.getComponent(id: id, rootComponent: generator.rootComponent)!
         let newItem = Item(component: newComponent)
         guard newItem != item else { return }
-        let parentItem = snapShot.itemIdentifiers.first(where: {$0.id == newComponent.parent!.id})!
-        reloadSnapShots(ofParentItem: parentItem)
-        //        snapShot.insertItems([newItem], beforeItem: item)
-        //        snapShot.deleteItems([item])
-        //        snapShot.reloadItems([])
-        //        dataSource.apply(snapShot, animatingDifferences: true)
-        if let indexPath = indexPath {
-            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
+        if let parentItem = snapShot.itemIdentifiers.first(where: {$0.id == newComponent.parent!.id}) {
+            reloadSnapShots(ofParentItem: parentItem)
+            if let indexPath = indexPath {
+                collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
+            }
         }
     }
     
@@ -234,13 +239,13 @@ extension EditorViewController {
         snapShot.expand([newItem])
         snapShot = snapShotWithChilds(ofItem: newItem, ofComponent: component, snapShot: snapShot)
         dataSource.apply(snapShot, to: .main)
-        updateParent(parentID: parentID)
+        updateItem(id: parentID)
     }
     
-    func updateParent(parentID: UUID) {
+    func updateItem(id: UUID) {
         var snapShot = dataSource.snapshot()
-        guard let parentItem = snapShot.itemIdentifiers.first(where: {$0.id == parentID}) else { return }
-        snapShot.reloadItems([parentItem])
+        guard let item = snapShot.itemIdentifiers.first(where: {$0.id == id}) else { return }
+        snapShot.reloadItems([item])
         dataSource.apply(snapShot)
     }
     
@@ -283,6 +288,13 @@ extension EditorViewController {
         return UISwipeActionsConfiguration(actions: [deleteAction])
     }
     
+    func leadingSwipeActionsConfigurationForProjectCellItem(item: Item) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .normal, title: NSLocalizedString("Duplicate", comment: "")) { _,_,_ in
+            self.duplicateItem(id: item.id)
+        }
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
 }
 
 extension EditorViewController {
@@ -304,20 +316,21 @@ extension EditorViewController {
     
     // MARK: -
     override func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        guard !isTutorial && !collectionView.isEditing else { return nil }
-        guard let item = dataSource.itemIdentifier(for: indexPath) else { fatalError() }
-        return UIContextMenuConfiguration(
-            identifier: indexPath as NSIndexPath,
-            previewProvider: nil,
-            actionProvider: { _ in
-                let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: "context menu"),image: UIImage(systemName: "trash"), attributes: [.destructive], state: .off) { _ in self.deleteItem(item.id) }
-                let duplicateAction = UIAction(title: NSLocalizedString("Duplicate", comment: "context menu"),image: UIImage(systemName: "plus.square.on.square"), attributes: [.init()], state: .off) { _ in self.duplicateItem(id: item.id) }
-                let children: [UIMenuElement] = [
-                    duplicateAction,
-                    UIMenu(options: .displayInline, children: [deleteAction])
-                ]
-                return UIMenu(title: "", children: children)
-            })
+        return nil
+//        guard !isTutorial && !collectionView.isEditing else { return nil }
+//        guard let item = dataSource.itemIdentifier(for: indexPath) else { fatalError() }
+//        return UIContextMenuConfiguration(
+//            identifier: indexPath as NSIndexPath,
+//            previewProvider: nil,
+//            actionProvider: { _ in
+//                let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: "context menu"),image: UIImage(systemName: "trash"), attributes: [.destructive], state: .off) { _ in self.deleteItem(item.id) }
+//                let duplicateAction = UIAction(title: NSLocalizedString("Duplicate", comment: "context menu"),image: UIImage(systemName: "plus.square.on.square"), attributes: [.init()], state: .off) { _ in self.duplicateItem(id: item.id) }
+//                let children: [UIMenuElement] = [
+//                    duplicateAction,
+//                    UIMenu(options: .displayInline, children: [deleteAction])
+//                ]
+//                return UIMenu(title: "", children: children)
+//            })
     }
     
 }
@@ -342,7 +355,7 @@ extension EditorViewController {
         guard let component = Component.getComponent(id: id, rootComponent: generator.rootComponent) else { return }
         applySnapshots(removeForID: id)
         component.parent!.remove(id: id)
-        updateParent(parentID: component.parent!.id)
+        updateItem(id: component.parent!.id)
         saveDocument()
         updateHTML()
     }
@@ -352,6 +365,7 @@ extension EditorViewController {
         let newComponent = component.copy(toParent: component.parent!)
         component.parent!.append(newComponent)
         saveDocument()
+        updateItem(id: id)
         applySnapshots(appendForComponent: newComponent)
         updateHTML()
     }
@@ -372,7 +386,6 @@ extension EditorViewController {
 
 extension EditorViewController {
     func reorder(with difference: CollectionDifference<Item>) {
-        let snapShot = dataSource.snapshot()
         var sectionSnapShot = dataSource.snapshot(for: .main)
         for diff in difference {
             switch diff {
@@ -394,7 +407,7 @@ extension EditorViewController {
                             sectionSnapShot.delete([item])
                             self.dataSource.apply(sectionSnapShot, to: .main)
                             self.reloadSnapShots(ofParentItem: previousItem)
-                            self.updateParent(parentID: previousParentID)
+                            self.updateItem(id: previousParentID)
                             self.updateHTML()
                             return
                         }
@@ -406,12 +419,12 @@ extension EditorViewController {
                     let index = indexOfChildItem(item, ofParentItem: parentItem)!
                     Component.moveChild(component, to: newParentComponent, at: index)
                 } else {
-                    let index = snapShot.indexOfItem(item)!
+                    let index = indexOfChildItem(item, ofParentItem: nil)!
                     Component.moveChild(component, to: generator.rootComponent, at: index)
                 }
                 sectionSnapShot.expand([item])
                 self.dataSource.apply(sectionSnapShot, to: .main)
-                self.updateParent(parentID: previousParentID)
+                self.updateItem(id: previousParentID)
                 
                 saveDocument()
                 updateHTML()
@@ -435,16 +448,27 @@ extension EditorViewController {
         self.dataSource.apply(sectionSnapShot, to: .main)
     }
     
-    private func indexOfChildItem(_ childItem: Item, ofParentItem parentItem: Item) -> Int? {
-        let sectionSnapShot = dataSource.snapshot(for: .main)
-        let parentSnapShot = dataSource.snapshot(for: .main).snapshot(of: parentItem)
-        let parentLevel = sectionSnapShot.level(of: parentItem)
+    private func indexOfChildItem(_ childItem: Item, ofParentItem parentItem: Item?) -> Int? {
         var index: Int?
-        for item in parentSnapShot.items {
-            if item == childItem { break }
-            if sectionSnapShot.level(of: item) == parentLevel + 1 {
-                if index == nil { index = 0 }
-                index! += 1;
+        if let parentItem = parentItem {
+            let sectionSnapShot = dataSource.snapshot(for: .main)
+            let parentSnapShot = dataSource.snapshot(for: .main).snapshot(of: parentItem)
+            let parentLevel = sectionSnapShot.level(of: parentItem)
+            for item in parentSnapShot.items {
+                if sectionSnapShot.level(of: item) == parentLevel + 1 {
+                    if index == nil { index = 0 }
+                    if item == childItem { break }
+                    index! += 1;
+                }
+            }
+        } else {
+            let sectionSnapShot = dataSource.snapshot(for: .main)
+            for item in sectionSnapShot.items {
+                if sectionSnapShot.level(of: item) == 0 {
+                    if index == nil { index = 0 }
+                    if item == childItem { break }
+                    index! += 1;
+                }
             }
         }
         return index

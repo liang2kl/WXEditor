@@ -10,7 +10,7 @@ import Foundation
 enum HTMLComponent: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
     enum Classification: Int, CaseIterable {
-        case paragraph, header, list, otherUseful, other
+        case paragraph, list, otherUseful, header, other
     }
     case p, section, span, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, li, br, hr, figure, figcaption, img, a, code, pre, footer, div, root
     var head: String {
@@ -153,10 +153,13 @@ class Component: NSObject, Codable {
                 backString.append(string)
             }
         }
+        let string = htmlComponent == .img ||
+            htmlComponent == .hr ||
+            htmlComponent == .br ? "" : (self.string ?? "")
         return
             "<\(htmlComponent.head + className)>" +
             frontString +
-            "\(string ?? "")" +
+            string +
             backString +
             "\(htmlComponent.tail != nil ? "</\(htmlComponent.tail!)>" : "")"
 
