@@ -130,9 +130,10 @@ extension EditorViewController {
             content.text = item.string
             content.image = UIImage(systemName: item.imageName)
             
-            cell.tintColor = .tint
+            let level = self.dataSource.snapshot(for: .main).level(of: item)
+            cell.tintColor = self.cellTintColorForLevel(level)
             cell.accessories = [
-                .label(text: item.type.head),
+                .label(text: item.type.head)
             ]
             if !self.isTutorial {
                 cell.accessories += [
@@ -147,6 +148,17 @@ extension EditorViewController {
             }
             cell.contentConfiguration = content
         }
+    }
+    
+    private func cellTintColorForLevel(_ level: Int) -> UIColor {
+        return .tint
+//        switch level {
+//        case 0: return .tint
+//        case 1: return UIColor.tint.withAlphaComponent(0.8)
+//        case 2: return UIColor.tint.withAlphaComponent(0.6)
+//        case 3: return UIColor.tint.withAlphaComponent(0.4)
+//        default: return UIColor.tint.withAlphaComponent(0.2)
+//        }
     }
     
     func configureDataSource() {

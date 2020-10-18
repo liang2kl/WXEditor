@@ -12,7 +12,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
     enum Classification: Int, CaseIterable {
         case paragraph, list, otherUseful, header, other
     }
-    case p, section, span, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, li, br, hr, figure, figcaption, img, a, code, pre, footer, div, root
+    case p, block, span, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, li, br, hr, figure, figcaption, img, a, code, pre, footer, div, root
     var head: String {
         switch self {
         case .p: return "p"
@@ -25,7 +25,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .br: return "br"
         case .hr: return "hr"
         case .root: return "root"
-        case .section: return "section"
+        case .block: return "block"
         case .h3: return "h3"
         case .h4: return "h4"
         case .h5: return "h5"
@@ -53,7 +53,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .br: return nil
         case .hr: return nil
         case .root: return nil
-        case .section: return "section"
+        case .block: return "block"
         case .h3: return "h3"
         case .h4: return "h4"
         case .h5: return "h5"
@@ -81,7 +81,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
         case .span: return "text.justify"
         case .root: return ""
         case .footer: return "dock.rectangle"
-        case .section: return "text.append"
+        case .block: return "text.append"
         case .h3: return "3.square"
         case .h4: return "4.square"
         case .h5: return "5.square"
@@ -100,7 +100,7 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
     
     var classification: Classification {
         switch self {
-        case .p, .section, .span, .blockquote: return .paragraph
+        case .p, .block, .span, .blockquote: return .paragraph
         case .h1, .h2, .h3, .h4, .h5, .h6: return .header
         case .ol, .ul, .li: return .list
         case .img, .figcaption, .br, .hr: return .otherUseful
@@ -132,7 +132,7 @@ class Component: NSObject, Codable {
     func makeComponent() -> String {
         let className = self.className == "" ? "" : " class=\"\(self.className)\" "
         if self.htmlComponent == .img {
-            return "<img\(className)src=\"\(string ?? "")\">"
+            return "<img \(className)src=\"\(string ?? "")\">"
         }
         if htmlComponent == .a {
             return "<a\(className)href=\"\(string ?? "")\">"

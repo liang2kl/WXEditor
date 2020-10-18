@@ -8,7 +8,11 @@
 import SwiftUI
 
 extension UIColor {
-    static let tint: UIColor = UIColor(named: "AccentColor")!
+    static let tint = UIColor(named: "AccentColor")!
+    static let tint1 = UIColor(named: "level_1")!
+    static let tint2 = UIColor(named: "level_2")!
+    static let tint3 = UIColor(named: "level_3")!
+    static let tint4 = UIColor(named: "level_4")!
 }
 
 extension Color {

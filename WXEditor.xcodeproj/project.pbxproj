@@ -11,7 +11,7 @@
 		0E37CED5252B25060000159D /* MyTextEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E37CED4252B25060000159D /* MyTextEditorView.swift */; };
 		0E37CED9252B255E0000159D /* MyTextEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E37CED8252B255E0000159D /* MyTextEditorViewController.swift */; };
 		0E3BB03E25297D22004DE5AD /* ComponentEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E3BB03D25297D22004DE5AD /* ComponentEditorViewController.swift */; };
-		0E3D97452534473200B64F18 /* tutorial.wedoc in Resources */ = {isa = PBXBuildFile; fileRef = 0E3D97442534473200B64F18 /* tutorial.wedoc */; };
+		0E3D9762253455EC00B64F18 /* tutorial.wedoc in Resources */ = {isa = PBXBuildFile; fileRef = 0E3D9761253455EC00B64F18 /* tutorial.wedoc */; };
 		0E9238E42528C2B800571918 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E9238E32528C2B800571918 /* TableView.swift */; };
 		0EAF0CD92528922900F552E6 /* EditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CD82528922900F552E6 /* EditorViewController.swift */; };
 		0EAF0CDD252895DA00F552E6 /* UIColor+tint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CDC252895DA00F552E6 /* UIColor+tint.swift */; };
@@ -52,7 +52,7 @@
 		0E37CED4252B25060000159D /* MyTextEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTextEditorView.swift; sourceTree = "<group>"; };
 		0E37CED8252B255E0000159D /* MyTextEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTextEditorViewController.swift; sourceTree = "<group>"; };
 		0E3BB03D25297D22004DE5AD /* ComponentEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentEditorViewController.swift; sourceTree = "<group>"; };
-		0E3D97442534473200B64F18 /* tutorial.wedoc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = tutorial.wedoc; sourceTree = "<group>"; };
+		0E3D9761253455EC00B64F18 /* tutorial.wedoc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = tutorial.wedoc; sourceTree = "<group>"; };
 		0E9238E32528C2B800571918 /* TableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
 		0E9238E62528D14800571918 /* WXEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WXEditor.entitlements; sourceTree = "<group>"; };
 		0EAF0CD82528922900F552E6 /* EditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewController.swift; sourceTree = "<group>"; };
@@ -134,7 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				0E106A2C252C6C1F003B0112 /* style.css */,
-				0E3D97442534473200B64F18 /* tutorial.wedoc */,
+				0E3D9761253455EC00B64F18 /* tutorial.wedoc */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -304,9 +304,9 @@
 			files = (
 				0ED9D58C252859BC00C5FB76 /* LaunchScreen.storyboard in Resources */,
 				0ED9D589252859BC00C5FB76 /* Assets.xcassets in Resources */,
+				0E3D9762253455EC00B64F18 /* tutorial.wedoc in Resources */,
 				0E106A2D252C6C1F003B0112 /* style.css in Resources */,
 				0ED9D587252859BB00C5FB76 /* Main.storyboard in Resources */,
-				0E3D97452534473200B64F18 /* tutorial.wedoc in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

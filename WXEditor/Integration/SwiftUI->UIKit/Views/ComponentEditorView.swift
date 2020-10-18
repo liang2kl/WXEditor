@@ -22,6 +22,7 @@ struct ComponentEditorView: View {
                         }
                     }
                 }
+                .animation(.spring())
                 .padding(.horizontal)
             }
             if componentState.type != .br {
@@ -39,6 +40,7 @@ struct ComponentEditorView: View {
                     .labelsHidden()
                     .keyboardType(.default)
                 }
+                .animation(.spring())
                 .padding(.top)
             }
             if componentState.type != .br &&
@@ -50,6 +52,7 @@ struct ComponentEditorView: View {
                         .padding(.horizontal)
                         .frame(minHeight: 40)
                 }
+                .animation(.spring())
             }
             Spacer()
             if componentState.type == .br ||
@@ -58,16 +61,15 @@ struct ComponentEditorView: View {
                 Text(NSLocalizedString("Children will be ignored in this element.", comment: ""))
                     .padding(.horizontal)
                     .padding(.top)
+                    .animation(.spring())
             }
             BorderedButton(action: {
                 viewController?.updatePreview()
             }) {
                 Label(NSLocalizedString("Update Preview", comment: ""), systemImage: "arrow.2.squarepath")
             }
-            .animation(.none)
             .padding()
         }
-        .animation(.spring())
         .disabled(isTutorial)
     }
 }
