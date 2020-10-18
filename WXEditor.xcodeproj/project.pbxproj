@@ -12,6 +12,8 @@
 		0E37CED9252B255E0000159D /* MyTextEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E37CED8252B255E0000159D /* MyTextEditorViewController.swift */; };
 		0E3BB03E25297D22004DE5AD /* ComponentEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E3BB03D25297D22004DE5AD /* ComponentEditorViewController.swift */; };
 		0E3D9762253455EC00B64F18 /* tutorial.wedoc in Resources */ = {isa = PBXBuildFile; fileRef = 0E3D9761253455EC00B64F18 /* tutorial.wedoc */; };
+		0E4FC94B253C3B7000DF6682 /* MyTextFieldViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E4FC94A253C3B7000DF6682 /* MyTextFieldViewController.swift */; };
+		0E4FC94F253C3BD800DF6682 /* MyTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E4FC94E253C3BD800DF6682 /* MyTextFieldView.swift */; };
 		0E9238E42528C2B800571918 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E9238E32528C2B800571918 /* TableView.swift */; };
 		0EAF0CD92528922900F552E6 /* EditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CD82528922900F552E6 /* EditorViewController.swift */; };
 		0EAF0CDD252895DA00F552E6 /* UIColor+tint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAF0CDC252895DA00F552E6 /* UIColor+tint.swift */; };
@@ -53,6 +55,8 @@
 		0E37CED8252B255E0000159D /* MyTextEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTextEditorViewController.swift; sourceTree = "<group>"; };
 		0E3BB03D25297D22004DE5AD /* ComponentEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentEditorViewController.swift; sourceTree = "<group>"; };
 		0E3D9761253455EC00B64F18 /* tutorial.wedoc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = tutorial.wedoc; sourceTree = "<group>"; };
+		0E4FC94A253C3B7000DF6682 /* MyTextFieldViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTextFieldViewController.swift; sourceTree = "<group>"; };
+		0E4FC94E253C3BD800DF6682 /* MyTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTextFieldView.swift; sourceTree = "<group>"; };
 		0E9238E32528C2B800571918 /* TableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
 		0E9238E62528D14800571918 /* WXEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WXEditor.entitlements; sourceTree = "<group>"; };
 		0EAF0CD82528922900F552E6 /* EditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewController.swift; sourceTree = "<group>"; };
@@ -105,8 +109,8 @@
 		0E37CED3252B24E90000159D /* UIKit->SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
-				0E37CED4252B25060000159D /* MyTextEditorView.swift */,
-				0E37CED8252B255E0000159D /* MyTextEditorViewController.swift */,
+				0E4FC949253C3B5A00DF6682 /* MyTextFieldView */,
+				0E4FC948253C3B4A00DF6682 /* MyTextEditorView */,
 			);
 			path = "UIKit->SwiftUI";
 			sourceTree = "<group>";
@@ -128,6 +132,24 @@
 				0ED9D5A4252875C500C5FB76 /* ComponentEditorView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		0E4FC948253C3B4A00DF6682 /* MyTextEditorView */ = {
+			isa = PBXGroup;
+			children = (
+				0E37CED4252B25060000159D /* MyTextEditorView.swift */,
+				0E37CED8252B255E0000159D /* MyTextEditorViewController.swift */,
+			);
+			path = MyTextEditorView;
+			sourceTree = "<group>";
+		};
+		0E4FC949253C3B5A00DF6682 /* MyTextFieldView */ = {
+			isa = PBXGroup;
+			children = (
+				0E4FC94A253C3B7000DF6682 /* MyTextFieldViewController.swift */,
+				0E4FC94E253C3BD800DF6682 /* MyTextFieldView.swift */,
+			);
+			path = MyTextFieldView;
 			sourceTree = "<group>";
 		};
 		0EAF0CDB252895CA00F552E6 /* Support */ = {
@@ -319,6 +341,7 @@
 			files = (
 				0EAF0CF42528C16600F552E6 /* LabelButtonView.swift in Sources */,
 				0ED9D584252859BB00C5FB76 /* HTMLPreviewViewController.swift in Sources */,
+				0E4FC94B253C3B7000DF6682 /* MyTextFieldViewController.swift in Sources */,
 				0E37CED9252B255E0000159D /* MyTextEditorViewController.swift in Sources */,
 				0ED9D59625285A2F00C5FB76 /* Component.swift in Sources */,
 				0EAF0D052528C18700F552E6 /* Disabled.swift in Sources */,
@@ -327,6 +350,7 @@
 				0EAF0D082528C18700F552E6 /* TopBarViewModifier.swift in Sources */,
 				0EAF0CF02528C16600F552E6 /* ListCell.swift in Sources */,
 				0EC771B0252A0B7E00F24032 /* FileViewController.swift in Sources */,
+				0E4FC94F253C3BD800DF6682 /* MyTextFieldView.swift in Sources */,
 				0EAF0D022528C18700F552E6 /* CellModifier.swift in Sources */,
 				0E37CED5252B25060000159D /* MyTextEditorView.swift in Sources */,
 				0EAF0D062528C18700F552E6 /* Layout.swift in Sources */,

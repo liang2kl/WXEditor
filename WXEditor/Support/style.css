@@ -43,7 +43,7 @@ h2 {
 }
 
 h3 {
-    margin-top: 7px;
+    margin-top: 10px;
     margin-bottom: 2px;
     letter-spacing: 2px;
     break-inside: avoid;
@@ -173,10 +173,6 @@ ol, ul {
     font-size: 14px;
     font-weight: lighter;
     text-align: left;
-}
-
-hr {
-    color: lightgray;
 }
 
 .comment {

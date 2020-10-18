@@ -22,7 +22,7 @@ class MyTextEditorViewController: UIViewController {
         super.viewDidLoad()
         view = textView
         textView.autocorrectionType = .no
-        textView.font = .systemFont(ofSize: 16)
+        textView.font = UIFont.monospacedSystemFont(ofSize: 16, weight: .regular)
     }
     
 }

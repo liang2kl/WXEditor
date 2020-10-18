@@ -10,31 +10,21 @@ import SwiftUI
 struct BlankView: View {
     var body: some View {
         HStack(spacing: 0) {
-            Group {
-                Text("<")
-                    .font(.custom("Menlo", size: 15, relativeTo: .body))
-                    .foregroundColor(.gray)
-                Text("Editor")
-                    .font(.custom("Menlo", size: 15, relativeTo: .body))
-                Text(">")
-                    .font(.custom("Menlo", size: 15, relativeTo: .body))
-                    .foregroundColor(.gray)
-            }
+            Text("<")
+                .foregroundColor(.gray)
+            Text("Editor")
+            Text(">")
+                .foregroundColor(.gray)
             Text(NSLocalizedString("Select an Element", comment: ""))
-                .font(.custom("Menlo", size: 15, relativeTo: .body))
                 .bold()
-            Group {
-                Text("</")
-                    .font(.custom("Menlo", size: 15, relativeTo: .body))
-                    .foregroundColor(.gray)
-                Text("Editor")
-                    .font(.custom("Menlo", size: 15, relativeTo: .body))
-                Text(">")
-                    .font(.custom("Menlo", size: 15, relativeTo: .body))
-                    .foregroundColor(.gray)
-            }
-
+            Text("</")
+                .foregroundColor(.gray)
+            Text("Editor")
+            Text(">")
+                .foregroundColor(.gray)
+            
         }
+        .font(Font(UIFont.monospacedSystemFont(ofSize: 15, weight: .regular) as CTFont))
     }
 }
 

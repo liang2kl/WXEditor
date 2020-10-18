@@ -9,15 +9,19 @@ import SwiftUI
 
 final class MyTextEditorView: UIViewControllerRepresentable {
     
-    init(vc: ComponentEditorViewController) {
-        self.viewController = vc
+    init(didChange: @escaping (String) -> Void, didFinish: @escaping () -> Void, string: String) {
+        self.didChange = didChange
+        self.didFinish = didFinish
+        self.string = string
     }
     
-    var viewController: ComponentEditorViewController
     var vc: MyTextEditorViewController!
+    var didChange: (String) -> Void
+    var didFinish: () -> Void
+    var string: String
     
     func makeUIViewController(context: Context) -> some UIViewController {
-        let controller = MyTextEditorViewController(string: viewController.componentState.string)
+        let controller = MyTextEditorViewController(string: string)
         vc = controller
         vc.textView.delegate = context.coordinator
         return controller
@@ -30,18 +34,7 @@ final class MyTextEditorView: UIViewControllerRepresentable {
     func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
-    
-    func updateComponent(string: String) {
-        viewController.componentState.string = string
-        viewController.updateComponent(component: viewController.component, type: viewController.componentState.type, className: viewController.componentState.className, string: viewController.componentState.string, refreshSideBar: false)
-    }
-    
-    func updateAppearance() {
-        viewController.updateSideBar(id: viewController.component.id)
-        viewController.updatePreview()
-    }
-
-    
+        
     class Coordinator: NSObject, UITextViewDelegate {
         var parent: MyTextEditorView
 
@@ -50,11 +43,11 @@ final class MyTextEditorView: UIViewControllerRepresentable {
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
-            parent.updateAppearance()
+            parent.didFinish()
         }
         
         func textViewDidChange(_ textView: UITextView) {
-            parent.updateComponent(string: textView.text)
+            parent.didChange(textView.text)
         }
     }
 

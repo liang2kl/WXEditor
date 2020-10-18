@@ -129,11 +129,12 @@ extension EditorViewController {
             var content = cell.defaultContentConfiguration()
             content.text = item.string
             content.image = UIImage(systemName: item.imageName)
+            content.textProperties.font = UIFont.monospacedSystemFont(ofSize: content.textProperties.font.pointSize, weight: .regular)
             
             let level = self.dataSource.snapshot(for: .main).level(of: item)
             cell.tintColor = self.cellTintColorForLevel(level)
             cell.accessories = [
-                .label(text: item.type.head)
+                .label(text: item.type.head, options: .init(font: .monospacedSystemFont(ofSize: 16, weight: .semibold)))
             ]
             if !self.isTutorial {
                 cell.accessories += [

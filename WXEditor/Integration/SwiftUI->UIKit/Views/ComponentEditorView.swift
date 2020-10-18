@@ -19,6 +19,7 @@ struct ComponentEditorView: View {
                         if componentType != .root {
                             Label(componentType.head, systemImage: componentType.imageName)
                                 .tag(componentType)
+                                .font(Font(UIFont.monospacedSystemFont(ofSize: 20, weight: .medium) as CTFont))
                         }
                     }
                 }
@@ -28,9 +29,9 @@ struct ComponentEditorView: View {
             if componentState.type != .br {
                 HStack(alignment: .center) {
                     Text(NSLocalizedString("Class", comment: ""))
-                        .font(.title2)
                         .bold()
                         .padding(.leading)
+                        .font(Font(UIFont.monospacedSystemFont(ofSize: 22, weight: .bold) as CTFont))
                     TextField("No Class", text: $componentState.className, onCommit: {
                         viewController?.updatePreview()
                     })
@@ -39,6 +40,7 @@ struct ComponentEditorView: View {
                     .padding(.trailing)
                     .labelsHidden()
                     .keyboardType(.default)
+                    .font(Font(UIFont.monospacedSystemFont(ofSize: 16, weight: .regular) as CTFont))
                 }
                 .animation(.spring())
                 .padding(.top)
@@ -47,7 +49,7 @@ struct ComponentEditorView: View {
                 componentState.type != .hr {
                 let title = (componentState.type == .img || componentState.type == .a) ? NSLocalizedString("URL", comment: "") : NSLocalizedString("Content", comment: "");
                 TableSection(title: title) {
-                    MyTextEditorView(vc: viewController!)
+                    MyTextEditorView(didChange: {textEditorDidChange(string: $0)}, didFinish: textEditorDidFinish, string: componentState.string)
                         .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
                         .padding(.horizontal)
                         .frame(minHeight: 40)
@@ -58,20 +60,34 @@ struct ComponentEditorView: View {
             if componentState.type == .br ||
                 componentState.type == .hr ||
                 componentState.type == .img {
-                Text(NSLocalizedString("Children will be ignored in this element.", comment: ""))
+                Text(NSLocalizedString("Nested elements will be ignored.", comment: ""))
                     .padding(.horizontal)
-                    .padding(.top)
+                    .padding(.top, 5)
                     .animation(.spring())
+                    .font(Font(UIFont.monospacedSystemFont(ofSize: 14, weight: .regular) as CTFont))
+                    .lineLimit(1)
             }
             BorderedButton(action: {
                 viewController?.updatePreview()
             }) {
                 Label(NSLocalizedString("Update Preview", comment: ""), systemImage: "arrow.2.squarepath")
+                    .font(Font(UIFont.monospacedSystemFont(ofSize: 16, weight: .semibold) as CTFont))
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.vertical, 5)
         }
         .disabled(isTutorial)
     }
 }
 
-
+extension ComponentEditorView {
+    func textEditorDidChange(string: String) {
+        viewController!.updateComponent(component: viewController!.component, type: componentState.type, className: componentState.className, string: string, refreshSideBar: false)
+    }
+    
+    func textEditorDidFinish() {
+        viewController!.updateSideBar(id: viewController!.component.id)
+        viewController?.updatePreview()
+    }
+    
+}

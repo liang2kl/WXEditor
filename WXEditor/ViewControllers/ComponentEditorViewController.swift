@@ -88,12 +88,6 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         newComponent = Component(type: type, parent: rootComponent)
         rootComponent.append(newComponent)
         update(newComponent: newComponent)
-        if let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController {
-            let item = editorVc.dataSource.snapshot().itemIdentifiers.first(where: {$0.id == newComponent.id})!
-            let indexPath = editorVc.dataSource.indexPath(for: item)!
-            editorVc.collectionView(editorVc.collectionView, didSelectItemAt: indexPath)
-            editorVc.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
-        }
     }
     
     func update(newComponent: Component) {
@@ -104,6 +98,13 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         previewVc.reload()
         editorVc.applySnapshots(appendForComponent: newComponent)
         editorVc.saveDocument()
+        if let editorVc = splitViewController?.viewController(for: .primary) as? EditorViewController,
+           let item = editorVc.dataSource.snapshot().itemIdentifiers.first(where: {$0.id == newComponent.id}),
+           let indexPath = editorVc.dataSource.indexPath(for: item) {
+            editorVc.collectionView(editorVc.collectionView, didSelectItemAt: indexPath)
+            editorVc.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredVertically)
+        }
+
     }
 
 
@@ -120,6 +121,7 @@ class ComponentState: ObservableObject {
             viewController?.updatePreview()
         }
     }
+    @Published var isEditingContent: Bool = false
     var viewController: ComponentEditorViewController?
     
     private func update(refreshSideBar: Bool) {
