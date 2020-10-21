@@ -129,8 +129,7 @@ extension EditorViewController {
             var content = cell.defaultContentConfiguration()
             content.text = item.string
             content.image = UIImage(systemName: item.imageName)
-            content.textProperties.font = UIFont.monospacedSystemFont(ofSize: content.textProperties.font.pointSize, weight: .regular)
-            
+            content.textProperties.numberOfLines = 1
             let level = self.dataSource.snapshot(for: .main).level(of: item)
             cell.tintColor = self.cellTintColorForLevel(level)
             cell.accessories = [
@@ -341,21 +340,24 @@ extension EditorViewController {
     
     // MARK: -
     override func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        #if targetEnvironment(macCatalyst)
+        guard !isTutorial && !collectionView.isEditing else { return nil }
+        guard let item = dataSource.itemIdentifier(for: indexPath) else { fatalError() }
+        return UIContextMenuConfiguration(
+            identifier: indexPath as NSIndexPath,
+            previewProvider: nil,
+            actionProvider: { _ in
+                let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: "context menu"),image: UIImage(systemName: "trash"), attributes: [.destructive], state: .off) { _ in self.deleteItem(item.id) }
+                let duplicateAction = UIAction(title: NSLocalizedString("Duplicate", comment: "context menu"),image: UIImage(systemName: "plus.square.on.square"), attributes: [.init()], state: .off) { _ in self.duplicateItem(id: item.id) }
+                let children: [UIMenuElement] = [
+                    duplicateAction,
+                    UIMenu(options: .displayInline, children: [deleteAction])
+                ]
+                return UIMenu(title: "", children: children)
+            })
+        #else
         return nil
-//        guard !isTutorial && !collectionView.isEditing else { return nil }
-//        guard let item = dataSource.itemIdentifier(for: indexPath) else { fatalError() }
-//        return UIContextMenuConfiguration(
-//            identifier: indexPath as NSIndexPath,
-//            previewProvider: nil,
-//            actionProvider: { _ in
-//                let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: "context menu"),image: UIImage(systemName: "trash"), attributes: [.destructive], state: .off) { _ in self.deleteItem(item.id) }
-//                let duplicateAction = UIAction(title: NSLocalizedString("Duplicate", comment: "context menu"),image: UIImage(systemName: "plus.square.on.square"), attributes: [.init()], state: .off) { _ in self.duplicateItem(id: item.id) }
-//                let children: [UIMenuElement] = [
-//                    duplicateAction,
-//                    UIMenu(options: .displayInline, children: [deleteAction])
-//                ]
-//                return UIMenu(title: "", children: children)
-//            })
+        #endif
     }
     
 }
@@ -462,7 +464,6 @@ extension EditorViewController {
                 sectionSnapShot.expand([item])
                 self.dataSource.apply(sectionSnapShot, to: .main)
                 self.updateItem(id: previousParentID)
-                
                 saveDocument()
                 updateHTML()
             default: break
@@ -500,6 +501,8 @@ extension EditorViewController {
             }
         } else {
             let sectionSnapShot = dataSource.snapshot(for: .main)
+            let items = sectionSnapShot.items
+            print(items)
             for item in sectionSnapShot.items {
                 if sectionSnapShot.level(of: item) == 0 {
                     if index == nil { index = 0 }

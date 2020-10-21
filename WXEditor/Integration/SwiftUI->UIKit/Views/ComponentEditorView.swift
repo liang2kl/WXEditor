@@ -13,37 +13,39 @@ struct ComponentEditorView: View {
     var viewController: ComponentEditorViewController?
     var body: some View {
         VStack {
-            TableSection(title: NSLocalizedString("Type", comment: "")) {
-                Picker("", selection: $componentState.type) {
-                    ForEach(HTMLComponent.allCases) { componentType in
-                        if componentType != .root {
-                            Label(componentType.head, systemImage: componentType.imageName)
-                                .tag(componentType)
-                                .font(Font(UIFont.monospacedSystemFont(ofSize: 20, weight: .medium) as CTFont))
-                        }
+            Picker("", selection: $componentState.type) {
+                ForEach(HTMLComponent.allCases) { componentType in
+                    if componentType != .root {
+                        Label(componentType.head, systemImage: componentType.imageName)
+                            .tag(componentType)
+                            .font(Font(UIFont.monospacedSystemFont(ofSize: 20, weight: .medium)))
                     }
                 }
-                .animation(.spring())
-                .padding(.horizontal)
             }
+            .animation(.spring())
+            .padding(.horizontal)
+            .overlay(
+                Text(NSLocalizedString("Type", comment: ""))
+                    .sectionTitle()
+                    .modifier(TopLeading())
+                    .padding(.top)
+            )
             if componentState.type != .br {
                 HStack(alignment: .center) {
                     Text(NSLocalizedString("Class", comment: ""))
-                        .bold()
-                        .padding(.leading)
-                        .font(Font(UIFont.monospacedSystemFont(ofSize: 22, weight: .bold) as CTFont))
+                        .sectionTitle()
                     TextField("No Class", text: $componentState.className, onCommit: {
                         viewController?.updatePreview()
                     })
                     .padding(3)
                     .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
                     .padding(.trailing)
+                    .padding(.leading, 3)
                     .labelsHidden()
                     .keyboardType(.default)
-                    .font(Font(UIFont.monospacedSystemFont(ofSize: 16, weight: .regular) as CTFont))
+                    .font(Font(UIFont.monospacedSystemFont(ofSize: 16, weight: .regular)))
                 }
                 .animation(.spring())
-                .padding(.top)
             }
             if componentState.type != .br &&
                 componentState.type != .hr {
@@ -52,7 +54,7 @@ struct ComponentEditorView: View {
                     MyTextEditorView(didChange: {textEditorDidChange(string: $0)}, didFinish: textEditorDidFinish, string: componentState.string)
                         .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
                         .padding(.horizontal)
-                        .frame(minHeight: 40)
+                        .frame(minHeight: 60)
                 }
                 .animation(.spring())
             }
@@ -90,4 +92,13 @@ extension ComponentEditorView {
         viewController?.updatePreview()
     }
     
+}
+
+extension Text {
+    func sectionTitle() -> some View {
+        return self
+            .bold()
+            .padding(.leading)
+            .font(Font(UIFont.monospacedSystemFont(ofSize: 22, weight: .bold) as CTFont))
+    }
 }

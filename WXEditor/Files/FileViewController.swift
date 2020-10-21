@@ -450,6 +450,7 @@ extension FileViewController: UIDocumentPickerDelegate {
         present(controller, animated: true)
     }
     
+    #if !targetEnvironment(macCatalyst)
     func getTypes(typeNames: [String]) -> [UTType] {
         var types = [UTType]()
         for identifier in typeNames {
@@ -457,6 +458,7 @@ extension FileViewController: UIDocumentPickerDelegate {
         }
         return types
     }
+    #endif
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         do {
