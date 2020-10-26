@@ -191,16 +191,6 @@
 			path = Modifiers;
 			sourceTree = "<group>";
 		};
-		0EC771AB252A0B6F00F24032 /* Files */ = {
-			isa = PBXGroup;
-			children = (
-				0EC771AC252A0B7800F24032 /* MyFileManager.swift */,
-				0EC771AF252A0B7E00F24032 /* FileViewController.swift */,
-				0EC771B5252A0E3100F24032 /* FileGenerator.swift */,
-			);
-			path = Files;
-			sourceTree = "<group>";
-		};
 		0ED9D573252859BB00C5FB76 = {
 			isa = PBXGroup;
 			children = (
@@ -220,7 +210,6 @@
 		0ED9D57E252859BB00C5FB76 /* WXEditor */ = {
 			isa = PBXGroup;
 			children = (
-				0EC771AB252A0B6F00F24032 /* Files */,
 				0ED9D5A3252875B900C5FB76 /* Integration */,
 				0ED9D59F252874AB00C5FB76 /* ViewControllers */,
 				0ED9D594252859FF00C5FB76 /* Model */,
@@ -241,8 +230,10 @@
 		0ED9D594252859FF00C5FB76 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				0EC771AC252A0B7800F24032 /* MyFileManager.swift */,
 				0ED9D59525285A2F00C5FB76 /* Component.swift */,
 				0ED9D5992528696000C5FB76 /* HTMLGenerator.swift */,
+				0EC771B5252A0E3100F24032 /* FileGenerator.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -250,6 +241,7 @@
 		0ED9D59F252874AB00C5FB76 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				0EC771AF252A0B7E00F24032 /* FileViewController.swift */,
 				0ED9D583252859BB00C5FB76 /* HTMLPreviewViewController.swift */,
 				0ED9D5A0252874CF00C5FB76 /* MainSplitViewController.swift */,
 				0EAF0CD82528922900F552E6 /* EditorViewController.swift */,

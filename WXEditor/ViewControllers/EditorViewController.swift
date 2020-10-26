@@ -133,7 +133,7 @@ extension EditorViewController {
             let level = self.dataSource.snapshot(for: .main).level(of: item)
             cell.tintColor = self.cellTintColorForLevel(level)
             cell.accessories = [
-                .label(text: item.type.head, options: .init(font: .monospacedSystemFont(ofSize: 16, weight: .semibold)))
+                .label(text: item.type.head)
             ]
             if !self.isTutorial {
                 cell.accessories += [
@@ -440,7 +440,9 @@ extension EditorViewController {
                     if let previousItem = dataSource.itemIdentifier(for: previousIndexPath),
                        let nextItem = dataSource.itemIdentifier(for: nextIndexPath) {
                         let newParentComponent = Component.getComponent(id: previousItem.id, rootComponent: generator.rootComponent)!
+                        print("print", sectionSnapShot.level(of: nextItem), sectionSnapShot.level(of: previousItem))
                         if sectionSnapShot.level(of: nextItem) == sectionSnapShot.level(of: previousItem) + 1 {
+                            print("heade", newParentComponent.htmlComponent.head)
                             Component.moveChild(component, to: newParentComponent, at: 0)
                             self.saveDocument()
                             sectionSnapShot.delete([item])
@@ -455,11 +457,13 @@ extension EditorViewController {
                 
                 if let parentItem = sectionSnapShot.parent(of: item) {
                     let newParentComponent = Component.getComponent(id: parentItem.id, rootComponent: generator.rootComponent)!
+                    print("heade", newParentComponent.htmlComponent.head)
                     let index = indexOfChildItem(item, ofParentItem: parentItem)!
                     Component.moveChild(component, to: newParentComponent, at: index)
                 } else {
                     let index = indexOfChildItem(item, ofParentItem: nil)!
                     Component.moveChild(component, to: generator.rootComponent, at: index)
+                    print("heade", "root")
                 }
                 sectionSnapShot.expand([item])
                 self.dataSource.apply(sectionSnapShot, to: .main)

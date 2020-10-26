@@ -117,7 +117,6 @@ class Component: NSObject, Codable {
     var parent: Component?
     var string: String?
     var htmlComponent: HTMLComponent = .p
-    var nestedInFront = false
     
     init(type: HTMLComponent, id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component?) {
         self.id = id
@@ -130,27 +129,20 @@ class Component: NSObject, Codable {
 
     
     func makeComponent() -> String {
-        let className = self.className == "" ? "" : " class=\"\(self.className)\" "
+        let className = self.className == "" ? " " : " class=\"\(self.className)\" "
         if self.htmlComponent == .img {
-            return "<img \(className)src=\"\(string ?? "")\">"
+            return "<img\(className)src=\"\(string ?? "")\">"
         }
         if htmlComponent == .a {
             return "<a\(className)href=\"\(string ?? "")\">"
         }
-        var frontString = ""
-        var backString = ""
+        var childString = ""
         if htmlComponent != .img &&
             htmlComponent != .hr &&
             htmlComponent != .br {
-            let frontChilds = childs.filter({$0.nestedInFront})
-            let backChilds = childs.filter({!$0.nestedInFront})
-            let frontStrings = frontChilds.map({$0.makeComponent()})
-            let backStrings = backChilds.map({$0.makeComponent()})
-            for string in frontStrings {
-                frontString.append(string)
-            }
-            for string in backStrings {
-                backString.append(string)
+            let strings = childs.map({$0.makeComponent()})
+            for string in strings {
+                childString.append(string)
             }
         }
         let string = htmlComponent == .img ||
@@ -158,9 +150,8 @@ class Component: NSObject, Codable {
             htmlComponent == .br ? "" : (self.string ?? "")
         return
             "<\(htmlComponent.head + className)>" +
-            frontString +
             string +
-            backString +
+            childString +
             "\(htmlComponent.tail != nil ? "</\(htmlComponent.tail!)>" : "")"
 
     }
@@ -238,7 +229,6 @@ class Component: NSObject, Codable {
         try container.encode(childs, forKey: .childs)
         try container.encode(string, forKey: .string)
         try container.encode(htmlComponent.rawValue, forKey: .type)
-        try container.encode(nestedInFront, forKey: .front)
     }
 
     required init(from decoder: Decoder) throws {
@@ -248,7 +238,6 @@ class Component: NSObject, Codable {
         childs = try values.decode([Component].self, forKey: .childs)
         string = try values.decode((String?).self, forKey: .string)
         htmlComponent = HTMLComponent(rawValue: try values.decode(Int.self, forKey: .type))!
-        nestedInFront = try values.decode(Bool.self, forKey: .front)
         for child in childs {
             child.parent = self
         }

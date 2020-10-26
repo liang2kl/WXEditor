@@ -34,6 +34,10 @@ final class MyTextEditorView: UIViewControllerRepresentable {
     func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
+    
+    func endEditing() {
+        vc.textView.endEditing(true)
+    }
         
     class Coordinator: NSObject, UITextViewDelegate {
         var parent: MyTextEditorView
@@ -50,6 +54,4 @@ final class MyTextEditorView: UIViewControllerRepresentable {
             parent.didChange(textView.text)
         }
     }
-
-    
 }
