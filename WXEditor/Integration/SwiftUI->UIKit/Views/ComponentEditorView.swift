@@ -9,24 +9,34 @@ import SwiftUI
 
 struct ComponentEditorView: View {
     @ObservedObject var componentState: ComponentState
+    @State var isEditingClassAndStyles: Bool = false
     var isTutorial: Bool = false
     var viewController: ComponentEditorViewController?
     var body: some View {
-        VStack {
-            TypePicker(type: $componentState.type)
-            if componentState.type != .br {
-                ClassEditorView(className: $componentState.className, onCommit: {viewController?.updatePreview()})
+        VStack(spacing: 0) {
+            if !isEditingClassAndStyles {
+                TypePicker(type: $componentState.type)
             }
+            ClassAndStylesView(isEditing: $isEditingClassAndStyles, className: $componentState.className, styles: $componentState.styles, updatePreview: {viewController?.updatePreview()})
+                .padding(.top)
+                .padding(.bottom, isEditingClassAndStyles ? nil : 0)
+                .animation(.default)
             if componentState.type != .br &&
                 componentState.type != .hr {
-                let title = (componentState.type == .img || componentState.type == .a) ? NSLocalizedString("URL", comment: "") : NSLocalizedString("Content", comment: "")
-                TableSection(title: title) {
-                    MyTextEditorView(didChange: textEditorDidChange, didFinish: textEditorDidFinish, string: componentState.string)
-                        .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
-                        .padding(.horizontal)
-                        .frame(minHeight: 80)
+                if isEditingClassAndStyles {
+                    ClassAndStylesEditorView(showsClassEditor: componentState.type != .br, className: $componentState.className, styles: $componentState.styles, updatePreview: {viewController?.updatePreview()})
+                        .animation(.default)
+                } else {
+                    let title = (componentState.type == .img || componentState.type == .a) ? NSLocalizedString("URL", comment: "") : NSLocalizedString("Content", comment: "")
+                    TableSection(title: title) {
+                        MyTextEditorView(didChange: textEditorDidChange, didFinish: textEditorDidFinish, string: componentState.string)
+                            .bordered()
+                            .padding(.horizontal)
+                            .padding(.top)
+                            .frame(minHeight: 80)
+                    }
+                    .animation(.default)
                 }
-                .animation(.spring())
             }
             Spacer()
             if componentState.type == .br ||
@@ -54,7 +64,7 @@ struct ComponentEditorView: View {
 
 extension ComponentEditorView {
     func textEditorDidChange(string: String) {
-        viewController!.updateComponent(component: viewController!.component, type: componentState.type, className: componentState.className, string: string, refreshSideBar: false)
+        viewController!.updateComponent(component: viewController!.component, type: componentState.type, className: componentState.className, string: string, styles: componentState.styles, refreshSideBar: false)
     }
     
     func textEditorDidFinish() {
@@ -65,6 +75,78 @@ extension ComponentEditorView {
 }
 
 extension ComponentEditorView {
+    struct ClassAndStylesEditorView: View {
+        var showsClassEditor: Bool
+        @Binding var className: String
+        @Binding var styles: String
+        var updatePreview: () -> Void
+        var body: some View {
+            VStack {
+                if showsClassEditor {
+                    TextFieldView(string: $className, title: "Class", onCommit: updatePreview)
+                        .padding(.vertical, 5)
+                }
+                Text(NSLocalizedString("Styles", comment: ""))
+                    .sectionTitle()
+                    .modifier(Leading())
+                MyTextEditorView(didChange: { string in styles = string }, didFinish: updatePreview, string: styles)
+                    .bordered()
+                    .padding(.horizontal)
+            }
+        }
+    }
+    
+    struct ClassAndStylesView: View {
+        @Binding var isEditing: Bool
+        @Binding var className: String
+        @Binding var styles: String
+        var updatePreview: () -> Void
+        var body: some View {
+            HStack {
+                if isEditing {
+                    Text(NSLocalizedString("Class And Styles", comment: ""))
+                        .sectionTitle()
+                } else {
+                    let classString = className == "" ? "None" : className
+                    let styleString = styles == "" ? "None" : styles.replacingOccurrences(of: "\n", with: " ")
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Text("Class ")
+                                .bold()
+                            Text(classString)
+                                .font(Font(UIFont.monospacedSystemFont(ofSize: 16, weight: .regular)))
+                                .foregroundColor(className == "" ? .gray : nil)
+                                .lineLimit(1)
+                        }
+                        HStack {
+                            Text("Styles ")
+                                .bold()
+                            Text(styleString)
+                                .font(Font(UIFont.monospacedSystemFont(ofSize: 16, weight: .regular)))
+                                .foregroundColor(styles == "" ? .gray : nil)
+                                .lineLimit(1)
+                        }
+                    }
+                    .padding(.leading)
+                }
+                Spacer()
+                Button(action: {
+                    isEditing.toggle()
+                    if !isEditing {
+                        updatePreview()
+                    }
+                }) {
+                    if !isEditing {
+                        Text(NSLocalizedString("Edit", comment: ""))
+                    } else {
+                        Text(NSLocalizedString("Done", comment: ""))
+                            .bold()
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
     struct TypePicker: View {
         @Binding var type: HTMLComponent
         var body: some View {
@@ -88,14 +170,15 @@ extension ComponentEditorView {
         }
     }
     
-    struct ClassEditorView: View {
-        @Binding var className: String
+    struct TextFieldView: View {
+        @Binding var string: String
+        var title: String
         var onCommit: () -> Void
         var body: some View {
             HStack(alignment: .center) {
-                Text(NSLocalizedString("Class", comment: ""))
+                Text(NSLocalizedString(title, comment: ""))
                     .sectionTitle()
-                TextField("No Class", text: $className, onCommit: onCommit)
+                TextField("No Class", text: $string, onCommit: onCommit)
                     .padding(3)
                     .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
                     .padding(.trailing)
@@ -116,5 +199,12 @@ extension Text {
             .font(.title2)
             .bold()
             .padding(.leading)
+    }
+}
+
+extension MyTextEditorView {
+    func bordered() -> some View {
+        return self
+            .overlay(RoundedRectangle(cornerRadius: 5).stroke().foregroundColor(Color(UIColor.systemFill)))
     }
 }

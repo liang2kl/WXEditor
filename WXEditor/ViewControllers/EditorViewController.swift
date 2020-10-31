@@ -73,6 +73,12 @@ extension EditorViewController {
     
     private func getAddButton() -> UIBarButtonItem {
         var menus = [UIMenu]()
+        let pasteAction = UIAction(title: NSLocalizedString("Paste", comment: ""), image: nil) { _ in
+            guard let data = UIPasteboard.general.data(forPasteboardType: "Whiz_Component"),
+                  let newComponent = FileGenerator.read(data) else { return }
+            self.pasteComponent(newComponent)
+        }
+        menus.append(UIMenu(options: .displayInline, children: [pasteAction]))
         for classification in HTMLComponent.Classification.allCases {
             var classChildren: [UIAction] = []
             for component in HTMLComponent.allCases where component != .root {
@@ -130,8 +136,7 @@ extension EditorViewController {
             content.text = item.string
             content.image = UIImage(systemName: item.imageName)
             content.textProperties.numberOfLines = 1
-            let level = self.dataSource.snapshot(for: .main).level(of: item)
-            cell.tintColor = self.cellTintColorForLevel(level)
+            cell.tintColor = .tint
             cell.accessories = [
                 .label(text: item.type.head)
             ]
@@ -148,17 +153,6 @@ extension EditorViewController {
             }
             cell.contentConfiguration = content
         }
-    }
-    
-    private func cellTintColorForLevel(_ level: Int) -> UIColor {
-        return .tint
-//        switch level {
-//        case 0: return .tint
-//        case 1: return UIColor.tint.withAlphaComponent(0.8)
-//        case 2: return UIColor.tint.withAlphaComponent(0.6)
-//        case 3: return UIColor.tint.withAlphaComponent(0.4)
-//        default: return UIColor.tint.withAlphaComponent(0.2)
-//        }
     }
     
     func configureDataSource() {
@@ -313,11 +307,16 @@ extension EditorViewController {
     }
     
     func leadingSwipeActionsConfigurationForProjectCellItem(item: Item) -> UISwipeActionsConfiguration? {
-        let deleteAction = UIContextualAction(style: .normal, title: NSLocalizedString("Duplicate", comment: "")) { _,_,_ in
+        let duplicateAction = UIContextualAction(style: .normal, title: NSLocalizedString("Duplicate", comment: "")) { _,_,_ in
             self.duplicateItem(id: item.id)
         }
         
-        return UISwipeActionsConfiguration(actions: [deleteAction])
+        let copyAction = UIContextualAction(style: .normal, title: NSLocalizedString("Copy", comment: "")) { _,_,_ in
+            self.copyItem(id: item.id)
+            self.updateItem(id: item.id)
+        }
+        
+        return UISwipeActionsConfiguration(actions: [copyAction, duplicateAction])
     }
 }
 
@@ -368,6 +367,17 @@ extension EditorViewController {
     func addComponent(type: HTMLComponent) {
         let rootComponent = generator.rootComponent
         let newComponent: Component = Component(type: type, parent: rootComponent)
+        addComponent(newComponent: newComponent)
+    }
+    
+    private func pasteComponent(_ component: Component) {
+        let rootComponent = generator.rootComponent
+        component.parent = rootComponent
+        addComponent(newComponent: component)
+    }
+    
+    private func addComponent(newComponent: Component) {
+        let rootComponent = generator.rootComponent
         var selectedItem: Item?
         if let selectedIndexPath = collectionView.indexPathsForSelectedItems?.first,
            let _selectedItem = dataSource.itemIdentifier(for: selectedIndexPath),
@@ -409,6 +419,11 @@ extension EditorViewController {
         updateHTML()
     }
     
+    private func copyItem(id: UUID) {
+        guard let component = Component.getComponent(id: id, rootComponent: generator.rootComponent),
+              let data = FileGenerator.generate(fromRoot: component) else { return }
+        UIPasteboard.general.setData(data, forPasteboardType: "Whiz_Component")
+    }
     
     func saveDocument() {
         guard !isTutorial else { return }

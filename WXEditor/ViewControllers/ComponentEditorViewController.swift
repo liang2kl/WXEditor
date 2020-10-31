@@ -29,12 +29,12 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateComponent(component: Component, type: HTMLComponent, className: String, string: String?, refreshSideBar: Bool) {
+    func updateComponent(component: Component, type: HTMLComponent, className: String, string: String?, styles: String, refreshSideBar: Bool) {
         guard !isTutorial else { return }
         let childs = component.childs
         let id = component.id
         let parent = component.parent!
-        self.component = Component(type: type, id: id, className: className, childs: childs, string: string, parent: parent)
+        self.component = Component(type: type, id: id, className: className, childs: childs, string: string, styles: styles, parent: parent)
         let originalComponentIndex = parent.childs.firstIndex(where: {$0.id == id})!
         parent.remove(at: originalComponentIndex)
         parent.insert(self.component, at: originalComponentIndex)
@@ -66,6 +66,12 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
     
     private func getAddButton() -> UIBarButtonItem {
         var menus = [UIMenu]()
+        let pasteAction = UIAction(title: NSLocalizedString("Paste", comment: ""), image: nil) { _ in
+            guard let data = UIPasteboard.general.data(forPasteboardType: "Whiz_Component"),
+                  let newComponent = FileGenerator.read(data) else { return }
+            self.pasteComponent(newComponent)
+        }
+        menus.append(UIMenu(options: .displayInline, children: [pasteAction]))
         for classification in HTMLComponent.Classification.allCases {
             var classChildren: [UIAction] = []
             for component in HTMLComponent.allCases where component != .root {
@@ -88,6 +94,12 @@ class ComponentEditorViewController: UIHostingController<ComponentEditorView> {
         newComponent = Component(type: type, parent: rootComponent)
         rootComponent.append(newComponent)
         update(newComponent: newComponent)
+    }
+    
+    func pasteComponent(_ component: Component) {
+        component.parent = self.component
+        self.component.append(component)
+        update(newComponent: component)
     }
     
     func update(newComponent: Component) {
@@ -115,6 +127,9 @@ class ComponentState: ObservableObject {
         didSet { update(refreshSideBar: false) }
     }
     @Published var string: String
+    @Published var styles: String {
+        didSet { update(refreshSideBar: false) }
+    }
     @Published var type: HTMLComponent {
         didSet {
             update(refreshSideBar: true)
@@ -126,12 +141,13 @@ class ComponentState: ObservableObject {
     
     private func update(refreshSideBar: Bool) {
         if let vc = viewController {
-            vc.updateComponent(component: vc.component, type: type, className: className, string: string, refreshSideBar: refreshSideBar)
+            vc.updateComponent(component: vc.component, type: type, className: className, string: string, styles: styles, refreshSideBar: refreshSideBar)
         }
     }
     init(component: Component) {
         self.string = component.string ?? ""
         self.type = component.htmlComponent
         self.className = component.className
+        self.styles = component.styles
     }
 }

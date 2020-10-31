@@ -111,17 +111,20 @@ enum HTMLComponent: Int, CaseIterable, Identifiable {
 }
 
 class Component: NSObject, Codable {
+    
     var id: UUID = UUID()
     var className: String = ""
     var childs: [Component] = []
     var parent: Component?
     var string: String?
+    var styles: String = ""
     var htmlComponent: HTMLComponent = .p
     
-    init(type: HTMLComponent, id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, parent: Component?) {
+    init(type: HTMLComponent, id: UUID = UUID(), className: String = "", childs: [Component] = [], string: String? = nil, styles: String = "", parent: Component?) {
         self.id = id
         self.childs = childs
         self.string = string
+        self.styles = styles
         self.parent = parent
         self.className = className
         self.htmlComponent = type
@@ -129,12 +132,10 @@ class Component: NSObject, Codable {
 
     
     func makeComponent() -> String {
-        let className = self.className == "" ? " " : " class=\"\(self.className)\" "
+        let className = self.className == "" ? "" : " class=\"\(self.className)\""
+        let styleString = self.styles == "" ? "" : " style=\"\(self.styles)\""
         if self.htmlComponent == .img {
-            return "<img\(className)src=\"\(string ?? "")\">"
-        }
-        if htmlComponent == .a {
-            return "<a\(className)href=\"\(string ?? "")\">"
+            return "<img\(className)\(styleString) src=\"\(string ?? "")\">"
         }
         var childString = ""
         if htmlComponent != .img &&
@@ -149,7 +150,7 @@ class Component: NSObject, Codable {
             htmlComponent == .hr ||
             htmlComponent == .br ? "" : (self.string ?? "")
         return
-            "<\(htmlComponent.head + className)>" +
+            htmlComponent == .a ? "<a\(className)\(styleString) href=\"\(self.string ?? "")\">" : "<\(htmlComponent.head + className + styleString)>" +
             string +
             childString +
             "\(htmlComponent.tail != nil ? "</\(htmlComponent.tail!)>" : "")"
@@ -174,7 +175,7 @@ class Component: NSObject, Codable {
     }
     
     func copy(toParent parent: Component) -> Component {
-        let newComponent = Component(type: self.htmlComponent, className: self.className, childs: [], string: self.string, parent: parent)
+        let newComponent = Component(type: self.htmlComponent, className: self.className, childs: [], string: self.string, styles: self.styles, parent: parent)
         let childs = copiedChilds(fromParent: self, toParent: newComponent)
         newComponent.childs = childs
         return newComponent
@@ -183,8 +184,7 @@ class Component: NSObject, Codable {
     private func copiedChilds(fromParent parent: Component, toParent newParent: Component) -> [Component] {
         var childs = [Component]()
         for child in parent.childs {
-            let newChild = Component(type: child.htmlComponent, className: child.className, childs: [], string: child.string, parent: newParent)
-            newChild.childs = copiedChilds(fromParent: child, toParent: newChild)
+            let newChild = Component(type: child.htmlComponent, className: child.className, childs: [], string: child.string, styles: child.styles, parent: newParent)
             childs.append(newChild)
         }
         return childs
@@ -220,7 +220,7 @@ class Component: NSObject, Codable {
     //MARK: - Codable
 
     enum CodingKeys: CodingKey {
-        case className, childs, parent, string, type, front
+        case className, childs, parent, string, styles, type, front
     }
 
     func encode(to encoder: Encoder) throws {
@@ -228,6 +228,7 @@ class Component: NSObject, Codable {
         try container.encode(className, forKey: .className)
         try container.encode(childs, forKey: .childs)
         try container.encode(string, forKey: .string)
+        try container.encode(styles, forKey: .styles)
         try container.encode(htmlComponent.rawValue, forKey: .type)
     }
 
@@ -237,6 +238,7 @@ class Component: NSObject, Codable {
         className = try values.decode(String.self, forKey: .className)
         childs = try values.decode([Component].self, forKey: .childs)
         string = try values.decode((String?).self, forKey: .string)
+        styles = (try? values.decode(String.self, forKey: .styles)) ?? ""
         htmlComponent = HTMLComponent(rawValue: try values.decode(Int.self, forKey: .type))!
         for child in childs {
             child.parent = self

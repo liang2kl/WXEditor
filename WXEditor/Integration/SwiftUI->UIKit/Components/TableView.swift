@@ -38,7 +38,7 @@ fileprivate struct TableHeader: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(Font(UIFont.monospacedSystemFont(ofSize: 22, weight: .bold) as CTFont))
+                .font(.title2)
                 .bold()
             Spacer()
             if displaysEditButton {
