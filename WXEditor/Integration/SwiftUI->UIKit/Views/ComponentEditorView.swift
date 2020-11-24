@@ -21,12 +21,12 @@ struct ComponentEditorView: View {
                 .padding(.top)
                 .padding(.bottom, isEditingClassAndStyles ? nil : 0)
                 .animation(.default)
-            if componentState.type != .br &&
-                componentState.type != .hr {
-                if isEditingClassAndStyles {
-                    ClassAndStylesEditorView(showsClassEditor: componentState.type != .br, className: $componentState.className, styles: $componentState.styles, updatePreview: {viewController?.updatePreview()})
-                        .animation(.default)
-                } else {
+            if isEditingClassAndStyles {
+                ClassAndStylesEditorView(showsClassEditor: componentState.type != .br, className: $componentState.className, styles: $componentState.styles, updatePreview: {viewController?.updatePreview()})
+                    .animation(.default)
+            } else {
+                if componentState.type != .br &&
+                    componentState.type != .hr {
                     let title = (componentState.type == .img || componentState.type == .a) ? NSLocalizedString("URL", comment: "") : NSLocalizedString("Content", comment: "")
                     TableSection(title: title) {
                         MyTextEditorView(didChange: textEditorDidChange, didFinish: textEditorDidFinish, string: componentState.string)
@@ -64,6 +64,7 @@ struct ComponentEditorView: View {
 
 extension ComponentEditorView {
     func textEditorDidChange(string: String) {
+        componentState.string = string  // componentState.string is not binded so it needs to be updated!
         viewController!.updateComponent(component: viewController!.component, type: componentState.type, className: componentState.className, string: string, styles: componentState.styles, refreshSideBar: false)
     }
     
@@ -89,7 +90,7 @@ extension ComponentEditorView {
                 Text(NSLocalizedString("Styles", comment: ""))
                     .sectionTitle()
                     .modifier(Leading())
-                MyTextEditorView(didChange: { string in styles = string }, didFinish: updatePreview, string: styles)
+                MyTextEditorView(didChange: { styles = $0 }, didFinish: updatePreview, string: styles)
                     .bordered()
                     .padding(.horizontal)
             }
@@ -104,7 +105,7 @@ extension ComponentEditorView {
         var body: some View {
             HStack {
                 if isEditing {
-                    Text(NSLocalizedString("Class And Styles", comment: ""))
+                    Text(NSLocalizedString("Class and Styles", comment: ""))
                         .sectionTitle()
                 } else {
                     let classString = className == "" ? "None" : className

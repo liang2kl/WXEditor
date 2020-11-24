@@ -27,7 +27,7 @@ class HTMLGenerator {
     }
     
     func exportHTML() -> String {
-        let style = try! String(contentsOf: Bundle.main.url(forResource: "style", withExtension: "css")!)
+        let style = try! String(contentsOf: Bundle.main.url(forResource: "style", withExtension: "css")!).replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "    ", with: "")
         let string = """
             <html>
                 <head>

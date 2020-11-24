@@ -126,7 +126,9 @@ class ComponentState: ObservableObject {
     @Published var className: String {
         didSet { update(refreshSideBar: false) }
     }
-    @Published var string: String
+    @Published var string: String {
+        didSet { update(refreshSideBar: false) }
+    }
     @Published var styles: String {
         didSet { update(refreshSideBar: false) }
     }

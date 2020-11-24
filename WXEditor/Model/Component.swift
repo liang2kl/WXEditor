@@ -150,7 +150,7 @@ class Component: NSObject, Codable {
             htmlComponent == .hr ||
             htmlComponent == .br ? "" : (self.string ?? "")
         return
-            htmlComponent == .a ? "<a\(className)\(styleString) href=\"\(self.string ?? "")\">" : "<\(htmlComponent.head + className + styleString)>" +
+            (htmlComponent == .a ? "<a\(className)\(styleString) href=\"\(self.string ?? "")\">" : "<\(htmlComponent.head + className + styleString)>") +
             string +
             childString +
             "\(htmlComponent.tail != nil ? "</\(htmlComponent.tail!)>" : "")"
@@ -185,6 +185,7 @@ class Component: NSObject, Codable {
         var childs = [Component]()
         for child in parent.childs {
             let newChild = Component(type: child.htmlComponent, className: child.className, childs: [], string: child.string, styles: child.styles, parent: newParent)
+            newChild.childs = copiedChilds(fromParent: child, toParent: newChild)
             childs.append(newChild)
         }
         return childs
